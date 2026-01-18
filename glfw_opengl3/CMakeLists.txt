@@ -2,7 +2,12 @@ cmake_minimum_required(VERSION 3.15)
 project(glfw_opengl3_example LANGUAGES CXX)
 
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../imgui)
+set(IMPLOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../implot)
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+file(GLOB_RECURSE SRC_SOURCES CONFIGURE_DEPENDS
+  ${SRC_DIR}/*.cpp
+)
 
 set(IMGUI_SOURCES
   ${IMGUI_DIR}/imgui.cpp
@@ -14,15 +19,21 @@ set(IMGUI_SOURCES
   ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
 )
 
+file(GLOB IMPLOT_SOURCES CONFIGURE_DEPENDS
+  ${IMPLOT_DIR}/*.cpp
+)
+
 add_executable(glfw_opengl3
   main.cpp
-  ${SRC_DIR}/app_main.cpp
+  ${SRC_SOURCES}
   ${IMGUI_SOURCES}
+  ${IMPLOT_SOURCES}
 )
 
 target_include_directories(glfw_opengl3 PRIVATE
   ${IMGUI_DIR}
   ${IMGUI_DIR}/backends
+  ${IMPLOT_DIR}
   ${SRC_DIR}
 )
 

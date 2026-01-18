@@ -1,5 +1,6 @@
 #include "app_main.hpp"
 #include "imgui.h"
+#include "implot.h"
 
 namespace MyApp {
 void RenderUI() {
