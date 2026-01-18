@@ -1,0 +1,5 @@
+
+
+namespace MyApp {
+void RenderUI();
+}
