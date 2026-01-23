@@ -1,8 +1,11 @@
-# Pitlane_plotter
-Plotter function for pitlane_rs. It is used for plotting data received by usb and helps in development of the 2027 E-Traxx ECUs
+# Pitlane_ControlDesk
 
-Inspired by Control desk and Arduino Serial Plotter function. 
-Usable with ESP32 and STM32 MCUs.
+ControlDesk-like development UI for **pitlane_rs**.
 
+Pitlane_ControlDesk is used during development of the **2027 E-Traxx ECUs** to visualize and inspect data streamed over USB/Serial (and similar links). It provides an Arduino Serial Plotter–style experience, plus the kind of signal/parameter dashboard workflow you’d expect from tools like dSPACE ControlDesk.
 
-@Ubdhoot Ashitosh
+Compatible with **ESP32** and **STM32** (and generally anything that can stream structured telemetry).
+
+---
+
+Maintainers: @Ubdhoot, @Ashitosh
