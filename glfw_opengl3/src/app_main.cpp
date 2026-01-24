@@ -4,12 +4,49 @@
 #include "plotter/plotter.hpp"
 #include "settings/settings.hpp"
 
+#include <iostream>
 #include <vector>
 
 // NOTE: Variable list
 namespace MyApp {
 
 std::vector<SETTINGS::VariableCheckbox> variables;
+
+// Mode
+// 1. Telemetry mode
+// 2. Plotter Mode
+// 3. Can_sniffer Mode
+int mode = 0;
+
+void ModeSelector() {
+  if (ImGui::BeginPopupModal("mode?", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::Text("This Program can be used in 3 Different Modes\nYou need to "
+                "choose one of them before you can proceed!");
+    ImGui::Separator();
+
+    // static int unused_i = 0;
+    // ImGui::Combo("Combo", &unused_i, "Delete\0Delete harder\0");
+
+    static bool dont_ask_me_next_time = false;
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+    ImGui::Checkbox("Select Mode: ", &dont_ask_me_next_time);
+    ImGui::PopStyleVar();
+
+    if (ImGui::Button("Debug", ImVec2(120, 0))) {
+      MyApp::mode = 1;
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SetItemDefaultFocus();
+    ImGui::SameLine();
+    if (ImGui::Button("CAN Sniffer", ImVec2(120, 0))) {
+      MyApp::mode = 2;
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+  ImGui::OpenPopup("mode?");
+}
 
 void RenderUI() {
   // TL;DR; this demo is more complicated than what most users you would
@@ -126,7 +163,14 @@ void RenderUI() {
   // 1. Serial Comm port reader and saving the data
   // 2. The plotter which will take the data and show it on the Settings windows
 
+  if (MyApp::mode != 1 && MyApp::mode != 2) {
+    ModeSelector();
+  }
+
+  // render Settings Window
   SETTINGS::RenderUI();
+
+  ImGui::ShowDemoWindow();
 
   ImGui::End();
 };
