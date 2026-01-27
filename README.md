@@ -8,4 +8,4 @@ Compatible with **ESP32** and **STM32** (and generally anything that can stream 
 
 ---
 
-Maintainers: @Ubdhoot, @Ashitosh
+Maintainers: @Ubdhoot Ashitosh
