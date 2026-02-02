@@ -1,4 +1,5 @@
 #include "app_main.hpp"
+#include "CAN_sniffer/can_sniffer.hpp"
 #include "imgui.h"
 #include "implot.h"
 #include "plotter/plotter.hpp"
@@ -10,14 +11,21 @@
 // NOTE: Variable list
 namespace MyApp {
 
+bool demo = false;
+
 std::vector<SETTINGS::VariableCheckbox> variables;
+CAN_SNIFFER_WINDOW::Sniffer_window sniffer =
+    CAN_SNIFFER_WINDOW::Sniffer_window();
 
 // Mode
-// 1. Telemetry mode
-// 2. Plotter Mode
-// 3. Can_sniffer Mode
+// 1. Plotter / Debug Mode
+// 2. Can_sniffer Mode
+// 3. Telemetry Mode
 int mode = 0;
-
+/* -----------------------------------------
+ * Purpose: At the start if the Program, asks the user to select a mode using a
+ * Popup window Input : NONE Output: NONE
+ */
 void ModeSelector() {
   if (ImGui::BeginPopupModal("mode?", NULL,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -170,8 +178,23 @@ void RenderUI() {
   // render Settings Window
   SETTINGS::RenderUI();
 
-  ImGui::ShowDemoWindow();
+  // based on the mode selection, we choose a mode.
+  switch (MyApp::mode) {
+  // Debug Mode
+  case 1:
 
+    break;
+
+  // renders the CAN_SNIFFER VIEW
+  case 2:
+    sniffer.RenderUI();
+    break;
+  }
+
+  // Just leave it here
+  if (demo) {
+    ImGui::ShowDemoWindow();
+  }
   ImGui::End();
 };
 } // namespace MyApp

@@ -19,13 +19,13 @@ IMGUI_DIR = ../imgui
 IMPLOT_DIR = ../implot
 SRC_DIR = src
 SOURCES = main.cpp
-SOURCES += $(SRC_DIR)/app_main.cpp
-SOURCES += $(SRC_DIR)/settings/settings.cpp
-SOURCES += $(SRC_DIR)/plotter/plotter.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 SOURCES += $(IMPLOT_DIR)/implot.cpp $(IMPLOT_DIR)/implot_items.cpp $(IMPLOT_DIR)/implot_demo.cpp
+# pull in every .cpp under src (any depth)
+SOURCES += $(shell find $(SRC_DIR) -name '*.cpp')
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
+VPATH = . $(IMGUI_DIR) $(IMGUI_DIR)/backends $(IMPLOT_DIR) $(shell find $(SRC_DIR) -type d)
 UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
 
@@ -77,24 +77,6 @@ endif
 ##---------------------------------------------------------------------
 
 %.o:%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-%.o:$(IMGUI_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-%.o:$(IMGUI_DIR)/backends/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-%.o:$(IMPLOT_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-%.o:$(SRC_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-%.o:$(SRC_DIR)/plotter/%.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-%.o:$(SRC_DIR)/settings/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 all: $(EXE)
