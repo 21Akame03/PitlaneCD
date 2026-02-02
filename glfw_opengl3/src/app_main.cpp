@@ -21,10 +21,13 @@ CAN_SNIFFER_WINDOW::Sniffer_window sniffer =
 // 1. Plotter / Debug Mode
 // 2. Can_sniffer Mode
 // 3. Telemetry Mode
-int mode = 0;
+Mode_t mode = Mode_t::NONE;
+
 /* -----------------------------------------
  * Purpose: At the start if the Program, asks the user to select a mode using a
- * Popup window Input : NONE Output: NONE
+ * Popup window
+ * Input : NONE
+ * Output: NONE
  */
 
 void ModeSelector() {
@@ -43,13 +46,13 @@ void ModeSelector() {
     ImGui::PopStyleVar();
 
     if (ImGui::Button("Debug", ImVec2(120, 0))) {
-      MyApp::mode = 1;
+      MyApp::mode = Mode_t::DEBUG;
       ImGui::CloseCurrentPopup();
     }
     ImGui::SetItemDefaultFocus();
     ImGui::SameLine();
     if (ImGui::Button("CAN Sniffer", ImVec2(120, 0))) {
-      MyApp::mode = 2;
+      MyApp::mode = Mode_t::CAN_SNIFFER;
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
@@ -172,7 +175,7 @@ void RenderUI() {
   // 1. Serial Comm port reader and saving the data
   // 2. The plotter which will take the data and show it on the Settings windows
 
-  if (MyApp::mode != 1 && MyApp::mode != 2) {
+  if (MyApp::mode == Mode_t::NONE) {
     ModeSelector();
   }
 
@@ -181,14 +184,20 @@ void RenderUI() {
 
   // based on the mode selection, we choose a mode.
   switch (MyApp::mode) {
+    // Mode Selector should still be there
+
   // Debug Mode
-  case 1:
+  case Mode_t::DEBUG:
 
     break;
 
   // renders the CAN_SNIFFER VIEW
-  case 2:
+  case Mode_t::CAN_SNIFFER:
     sniffer.RenderUI();
+    break;
+
+  case Mode_t::NONE:
+  default:
     break;
   }
 

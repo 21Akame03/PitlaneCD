@@ -83,7 +83,7 @@ int main(int, char **) {
       glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
   GLFWwindow *window =
       glfwCreateWindow((int)(1280 * main_scale), (int)(800 * main_scale),
-                       "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+                       "Pitlane", nullptr, nullptr);
   if (window == nullptr)
     return 1;
   glfwMakeContextCurrent(window);
