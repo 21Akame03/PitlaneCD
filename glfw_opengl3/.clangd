@@ -1,0 +1,7 @@
+CompileFlags:
+  Add:
+    -std=c++11
+    -I../imgui
+    -I../imgui/backends
+    -I../implot
+    -Isrc

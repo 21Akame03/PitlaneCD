@@ -26,6 +26,7 @@ int mode = 0;
  * Purpose: At the start if the Program, asks the user to select a mode using a
  * Popup window Input : NONE Output: NONE
  */
+
 void ModeSelector() {
   if (ImGui::BeginPopupModal("mode?", NULL,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
