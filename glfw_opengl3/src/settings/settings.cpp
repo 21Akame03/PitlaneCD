@@ -1,10 +1,12 @@
 #include "settings.hpp"
+#include "ImGuiFileDialog.h"
 #include "Serial_reader/serial_inputs.hpp"
 #include "app_main.hpp"
 #include "imgui.h"
 #include "plotter/plotter.hpp"
 #include <cstdio>
 #include <iostream>
+#include <string>
 #include <vector>
 
 namespace SETTINGS {
@@ -13,6 +15,8 @@ namespace SETTINGS {
 std::vector<std::string> com_ports = {"Disconnected"};
 static int current_port = 0;
 static bool ispollActive = false;
+static std::string dbc_file_path;
+static const char *DBC_DIALOG_KEY = "dbc_file_dialog";
 
 // Serial Reader object
 static SERIAL::SerialReader serialReader;
@@ -74,18 +78,59 @@ void connection_selector() {
 /*
  * Purpose: Select the DBC file using a file dialog
  */
-void dbc_selector() {}
+void dbc_selector() {
+  ImGui::SeparatorText("DBC File");
+  ImGui::TextWrapped("Select a .dbc file to decode CAN frames.");
+
+  const bool has_selection = !dbc_file_path.empty();
+  ImGui::TextWrapped("Selected: %s",
+                     has_selection ? dbc_file_path.c_str() : "None");
+
+  if (ImGui::Button("Browse##dbc")) {
+    IGFD::FileDialogConfig config;
+
+    // Re-open the dialog in the last used directory when possible
+    if (has_selection) {
+      const size_t split = dbc_file_path.find_last_of("/\\");
+      if (split != std::string::npos && split > 0) {
+        config.path = dbc_file_path.substr(0, split);
+      }
+    }
+
+    if (config.path.empty())
+      config.path = ".";
+
+    ImGuiFileDialog::Instance()->OpenDialog(DBC_DIALOG_KEY, "Select DBC file",
+                                            ".dbc", config);
+  }
+
+  // ImGui::SameLine();
+  if (has_selection && ImGui::SmallButton("Clear##dbc")) {
+    dbc_file_path.clear();
+  }
+
+  if (ImGuiFileDialog::Instance()->Display(DBC_DIALOG_KEY)) {
+    if (ImGuiFileDialog::Instance()->IsOk()) {
+      dbc_file_path = ImGuiFileDialog::Instance()->GetFilePathName();
+    }
+    ImGuiFileDialog::Instance()->Close();
+  }
+}
 
 void RenderUI() {
   ImGui::Begin("Settings Window");
 
   connection_selector();
 
-  if (MyApp::mode == 2)
+  if (MyApp::mode == MyApp::CAN_SNIFFER) {
+    // UI for the File Dialog
     dbc_selector();
 
-  ImGui::Text("Available Variables:");
+    // Data Parser through CAN
+  }
+
   ImGui::Separator();
+  ImGui::Text("Available Variables:");
 
   if (ImGui::BeginListBox("##listbox Variables", ImVec2(-FLT_MIN, -1))) {
     createCheckboxes(MyApp::variables);

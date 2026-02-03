@@ -17,19 +17,22 @@
 EXE = example_glfw_opengl3
 IMGUI_DIR = ../imgui
 IMPLOT_DIR = ../implot
+IMGUIFILEDIALOG_DIR = ../ImGuiFileDialog 
 SRC_DIR = src
 SOURCES = main.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 SOURCES += $(IMPLOT_DIR)/implot.cpp $(IMPLOT_DIR)/implot_items.cpp $(IMPLOT_DIR)/implot_demo.cpp
+SOURCES += $(IMGUIFILEDIALOG_DIR)/ImGuiFileDialog.cpp 
+
 # pull in every .cpp under src (any depth)
 SOURCES += $(shell find $(SRC_DIR) -name '*.cpp')
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
-VPATH = . $(IMGUI_DIR) $(IMGUI_DIR)/backends $(IMPLOT_DIR) $(shell find $(SRC_DIR) -type d)
+VPATH = . $(IMGUI_DIR) $(IMGUI_DIR)/backends $(IMPLOT_DIR) $(IMGUIFILEDIALOG_DIR) $(shell find $(SRC_DIR) -type d)
 UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
 
-CXXFLAGS = -std=c++17 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(IMPLOT_DIR) -I$(SRC_DIR)
+CXXFLAGS = -std=c++17 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(IMPLOT_DIR) -I$(SRC_DIR) -I$(IMGUIFILEDIALOG_DIR) 
 CXXFLAGS += -g -Wall -Wformat
 LIBS =
 
