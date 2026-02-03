@@ -8,3 +8,6 @@
 [submodule "ImGuiFileDialog"]
 	path = ImGuiFileDialog
 	url = git@github.com:aiekick/ImGuiFileDialog.git
+[submodule "dbcppp"]
+	path = dbcppp
+	url = git@github.com:xR3b0rn/dbcppp.git
