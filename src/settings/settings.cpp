@@ -130,9 +130,10 @@ void RenderUI() {
 
     // Data Parser through CAN
     // check if dbc file has been selected
-    if (!dbc_file_path.empty() && parser.dbcfilepath_.empty()) {
+    if (!dbc_file_path.empty() &&
+        CAN_SNIFFER_WINDOW::parser.dbcfilepath_.empty()) {
       // run the CAN_sniffer and data parser subroutines
-      parser.dbcfilepath_ = dbc_file_path;
+      CAN_SNIFFER_WINDOW::parser.dbcfilepath_ = dbc_file_path;
     }
   }
 

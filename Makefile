@@ -15,11 +15,43 @@
 #CXX = clang++
 
 EXE = example_glfw_opengl3
-IMGUI_DIR = ../imgui
-IMPLOT_DIR = ../implot
-IMGUIFILEDIALOG_DIR = ../ImGuiFileDialog
-VECTOR_DBC_DIR = ../vector_dbc
-VECTOR_DBC_LIB ?= $(VECTOR_DBC_DIR)/build/src/Vector/DBC/libVector_DBC.dylib
+# Primary dependency locations (expected as sibling checkouts)
+IMGUI_DIR ?= ../imgui
+IMPLOT_DIR ?= ../implot
+IMGUIFILEDIALOG_DIR ?= ../ImGuiFileDialog
+VECTOR_DBC_DIR ?= ../vector_dbc
+VECTOR_DBC_BUILD_DIR ?= $(VECTOR_DBC_DIR)/build
+VECTOR_DBC_LIB ?= $(VECTOR_DBC_BUILD_DIR)/src/Vector/DBC/libVector_DBC.dylib
+
+# Fallback to CMake FetchContent outputs (generated under build/_deps)
+IMGUI_FALLBACK := build/_deps/imgui-src
+IMPLOT_FALLBACK := build/_deps/implot-src
+IMGUIFILEDIALOG_FALLBACK := build/_deps/imguifiledialog-src
+VECTOR_DBC_FALLBACK := build/_deps/vector_dbc-src
+VECTOR_DBC_FALLBACK_BUILD := build/_deps/vector_dbc-build
+
+# Prefer sibling checkouts, otherwise use fetched sources if present
+ifneq ("$(wildcard $(IMGUI_DIR)/imgui.h)","")
+else ifneq ("$(wildcard $(IMGUI_FALLBACK)/imgui.h)","")
+	IMGUI_DIR := $(IMGUI_FALLBACK)
+endif
+
+ifneq ("$(wildcard $(IMPLOT_DIR)/implot.h)","")
+else ifneq ("$(wildcard $(IMPLOT_FALLBACK)/implot.h)","")
+	IMPLOT_DIR := $(IMPLOT_FALLBACK)
+endif
+
+ifneq ("$(wildcard $(IMGUIFILEDIALOG_DIR)/ImGuiFileDialog.h)","")
+else ifneq ("$(wildcard $(IMGUIFILEDIALOG_FALLBACK)/ImGuiFileDialog.h)","")
+	IMGUIFILEDIALOG_DIR := $(IMGUIFILEDIALOG_FALLBACK)
+endif
+
+ifneq ("$(wildcard $(VECTOR_DBC_BUILD_DIR)/src/Vector/DBC/libVector_DBC.*)","")
+else ifneq ("$(wildcard $(VECTOR_DBC_FALLBACK_BUILD)/src/Vector/DBC/libVector_DBC.*)","")
+	VECTOR_DBC_DIR := $(VECTOR_DBC_FALLBACK)
+	VECTOR_DBC_BUILD_DIR := $(VECTOR_DBC_FALLBACK_BUILD)
+endif
+VECTOR_DBC_LIB := $(firstword $(wildcard $(VECTOR_DBC_BUILD_DIR)/src/Vector/DBC/libVector_DBC.*))
 SRC_DIR = src
 SOURCES = main.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
@@ -37,7 +69,7 @@ LINUX_GL_LIBS = -lGL
 CXXFLAGS = -std=c++17 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(IMPLOT_DIR) -I$(SRC_DIR) -I$(IMGUIFILEDIALOG_DIR)
 # Prefer local vector_dbc headers if present
 ifneq ("$(wildcard $(VECTOR_DBC_DIR)/src/Vector/DBC/Network.h)","")
-	CXXFLAGS += -I$(VECTOR_DBC_DIR)/src -I$(VECTOR_DBC_DIR)/build/src/Vector/DBC
+	CXXFLAGS += -I$(VECTOR_DBC_DIR)/src -I$(VECTOR_DBC_BUILD_DIR)/src
 endif
 CXXFLAGS += -g -Wall -Wformat
 LIBS = $(VECTOR_DBC_LIB)
@@ -65,8 +97,8 @@ endif
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
 	LIBS += -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
-	LIBS += -L/usr/local/lib -L/opt/local/lib -L/opt/homebrew/lib -L$(VECTOR_DBC_DIR)/build/src/Vector/DBC
-	LIBS += -Wl,-rpath,$(VECTOR_DBC_DIR)/build/src/Vector/DBC
+	LIBS += -L/usr/local/lib -L/opt/local/lib -L/opt/homebrew/lib -L$(VECTOR_DBC_BUILD_DIR)/src/Vector/DBC
+	LIBS += -Wl,-rpath,$(VECTOR_DBC_BUILD_DIR)/src/Vector/DBC
 	#LIBS += -lglfw3
 	LIBS += -lglfw
 

@@ -208,4 +208,4 @@ __marimo__/
 
 
 
-glfw_opengl3/*.o
+*.o

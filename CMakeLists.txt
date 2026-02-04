@@ -1,19 +1,56 @@
 cmake_minimum_required(VERSION 3.15)
 project(glfw_opengl3_example LANGUAGES CXX)
 
-set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../imgui)
-set(IMPLOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../implot)
-set(IMGUIFILEDIALOG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../ImGuiFileDialog)
-set(VECTOR_DBC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vector_dbc)
+
+include(FetchContent)
+
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        703bd9caab50b139428cea1aaff9974ebee5742e # release-1.10.0
+)
+
+
+FetchContent_Declare(
+  imgui
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG docking
+)
+FetchContent_Declare(
+  implot
+  GIT_REPOSITORY https://github.com/epezent/implot.git
+  GIT_TAG master
+)
+FetchContent_Declare(
+  ImGuiFileDialog
+  GIT_REPOSITORY https://github.com/aiekick/ImGuiFileDialog.git
+  GIT_TAG master
+)
+FetchContent_Declare(
+  vector_dbc
+  GIT_REPOSITORY https://bitbucket.org/tobylorenz/vector_dbc.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(imgui implot ImGuiFileDialog vector_dbc)
+
+# Ensure vector_dbc finds its own headers when used as a subproject
+if(TARGET Vector_DBC)
+  target_include_directories(Vector_DBC PUBLIC
+    ${vector_dbc_SOURCE_DIR}/src
+    ${vector_dbc_BINARY_DIR}/src)
+endif()
+
+# Point ImGuiFileDialog at the fetched imgui headers when the package lookup fails
+if(TARGET ImGuiFileDialog)
+  target_include_directories(ImGuiFileDialog PUBLIC ${imgui_SOURCE_DIR})
+endif()
+
+set(IMGUI_DIR ${imgui_SOURCE_DIR})
+set(IMPLOT_DIR ${implot_SOURCE_DIR})
+set(IMGUIFILEDIALOG_DIR ${imguifiledialog_SOURCE_DIR})
+set(VECTOR_DBC_BINARY_DIR ${vector_dbc_BINARY_DIR})
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-set(OPTION_RUN_DOXYGEN OFF CACHE BOOL "" FORCE)
-set(OPTION_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(OPTION_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(OPTION_USE_GCOV OFF CACHE BOOL "" FORCE)
-set(OPTION_USE_GPROF OFF CACHE BOOL "" FORCE)
-
-add_subdirectory(${VECTOR_DBC_DIR} ${CMAKE_CURRENT_BINARY_DIR}/vector_dbc)
 
 file(GLOB_RECURSE SRC_SOURCES CONFIGURE_DEPENDS
   ${SRC_DIR}/*.cpp
@@ -53,8 +90,7 @@ target_include_directories(glfw_opengl3 PRIVATE
   ${IMPLOT_DIR}
   ${IMGUIFILEDIALOG_DIR}
   ${SRC_DIR}
-  ${VECTOR_DBC_DIR}/src
-  ${CMAKE_CURRENT_BINARY_DIR}/vector_dbc/src/Vector/DBC
+  ${VECTOR_DBC_BINARY_DIR}/src/Vector/DBC
 )
 
 target_compile_features(glfw_opengl3 PRIVATE cxx_std_17)

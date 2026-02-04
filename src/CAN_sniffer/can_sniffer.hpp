@@ -12,8 +12,8 @@ public:
   void RenderUI();
 };
 
-} // namespace CAN_SNIFFER_WINDOW
-
 extern CANDBC_PARSER::DBCParser parser;
+
+} // namespace CAN_SNIFFER_WINDOW
 
 #endif
