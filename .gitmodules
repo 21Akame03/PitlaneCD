@@ -11,3 +11,6 @@
 [submodule "dbcppp"]
 	path = dbcppp
 	url = git@github.com:xR3b0rn/dbcppp.git
+[submodule "vector_dbc"]
+	path = vector_dbc
+	url = https://bitbucket.org/tobylorenz/vector_dbc.git

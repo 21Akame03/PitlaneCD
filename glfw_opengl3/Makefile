@@ -18,10 +18,8 @@ EXE = example_glfw_opengl3
 IMGUI_DIR = ../imgui
 IMPLOT_DIR = ../implot
 IMGUIFILEDIALOG_DIR = ../ImGuiFileDialog
-DBCPPP_DIR = ../dbcppp
-DBCPPP_LIB ?= $(DBCPPP_DIR)/build/libdbcppp.a
-DBCPPP_XMLMM_LIB ?= $(DBCPPP_DIR)/build/third-party/libxmlmm/libxmlmm.dylib
-DBCPPP_XML2_LIB ?= -lxml2
+VECTOR_DBC_DIR = ../vector_dbc
+VECTOR_DBC_LIB ?= $(VECTOR_DBC_DIR)/build/src/Vector/DBC/libVector_DBC.dylib
 SRC_DIR = src
 SOURCES = main.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
@@ -37,12 +35,12 @@ UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
 
 CXXFLAGS = -std=c++17 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(IMPLOT_DIR) -I$(SRC_DIR) -I$(IMGUIFILEDIALOG_DIR)
-# Prefer local dbcppp headers if present
-ifneq ("$(wildcard $(DBCPPP_DIR)/include/dbcppp/Message.h)","")
-	CXXFLAGS += -I$(DBCPPP_DIR)/include
+# Prefer local vector_dbc headers if present
+ifneq ("$(wildcard $(VECTOR_DBC_DIR)/src/Vector/DBC/Network.h)","")
+	CXXFLAGS += -I$(VECTOR_DBC_DIR)/src -I$(VECTOR_DBC_DIR)/build/src/Vector/DBC
 endif
 CXXFLAGS += -g -Wall -Wformat
-LIBS = $(DBCPPP_LIB) $(DBCPPP_XMLMM_LIB) $(DBCPPP_XML2_LIB)
+LIBS = $(VECTOR_DBC_LIB)
 
 ##---------------------------------------------------------------------
 ## OPENGL ES
@@ -67,8 +65,8 @@ endif
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
 	LIBS += -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
-	LIBS += -L/usr/local/lib -L/opt/local/lib -L/opt/homebrew/lib -L$(DBCPPP_DIR)/build/third-party/libxmlmm
-	LIBS += -Wl,-rpath,$(DBCPPP_DIR)/build/third-party/libxmlmm
+	LIBS += -L/usr/local/lib -L/opt/local/lib -L/opt/homebrew/lib -L$(VECTOR_DBC_DIR)/build/src/Vector/DBC
+	LIBS += -Wl,-rpath,$(VECTOR_DBC_DIR)/build/src/Vector/DBC
 	#LIBS += -lglfw3
 	LIBS += -lglfw
 

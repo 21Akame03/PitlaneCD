@@ -4,15 +4,16 @@ project(glfw_opengl3_example LANGUAGES CXX)
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../imgui)
 set(IMPLOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../implot)
 set(IMGUIFILEDIALOG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../ImGuiFileDialog)
-set(DBCPPP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../dbcppp)
+set(VECTOR_DBC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vector_dbc)
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-# Build only the dbcppp library (skip its tools/tests/examples)
-set(build_kcd OFF CACHE BOOL "" FORCE)
-set(build_tools OFF CACHE BOOL "" FORCE)
-set(build_tests OFF CACHE BOOL "" FORCE)
-set(build_examples OFF CACHE BOOL "" FORCE)
-add_subdirectory(${DBCPPP_DIR} ${CMAKE_CURRENT_BINARY_DIR}/dbcppp)
+set(OPTION_RUN_DOXYGEN OFF CACHE BOOL "" FORCE)
+set(OPTION_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(OPTION_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(OPTION_USE_GCOV OFF CACHE BOOL "" FORCE)
+set(OPTION_USE_GPROF OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(${VECTOR_DBC_DIR} ${CMAKE_CURRENT_BINARY_DIR}/vector_dbc)
 
 file(GLOB_RECURSE SRC_SOURCES CONFIGURE_DEPENDS
   ${SRC_DIR}/*.cpp
@@ -52,6 +53,8 @@ target_include_directories(glfw_opengl3 PRIVATE
   ${IMPLOT_DIR}
   ${IMGUIFILEDIALOG_DIR}
   ${SRC_DIR}
+  ${VECTOR_DBC_DIR}/src
+  ${CMAKE_CURRENT_BINARY_DIR}/vector_dbc/src/Vector/DBC
 )
 
 target_compile_features(glfw_opengl3 PRIVATE cxx_std_17)
@@ -70,7 +73,7 @@ endif()
 target_link_libraries(glfw_opengl3 PRIVATE
   OpenGL::GL
   ${GLFW_TARGET}
-  dbcppp
+  Vector_DBC
 )
 
 if(APPLE)

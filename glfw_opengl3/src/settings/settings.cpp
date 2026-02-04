@@ -1,4 +1,6 @@
 #include "settings.hpp"
+#include "CAN_sniffer/can_sniffer.hpp"
+#include "CAN_sniffer/libs/candbc_parser.hpp"
 #include "ImGuiFileDialog.h"
 #include "Serial_reader/serial_inputs.hpp"
 #include "app_main.hpp"
@@ -127,6 +129,11 @@ void RenderUI() {
     dbc_selector();
 
     // Data Parser through CAN
+    // check if dbc file has been selected
+    if (!dbc_file_path.empty() && parser.dbcfilepath_.empty()) {
+      // run the CAN_sniffer and data parser subroutines
+      parser.dbcfilepath_ = dbc_file_path;
+    }
   }
 
   ImGui::Separator();

@@ -1,4 +1,5 @@
 #include "can_sniffer.hpp"
+#include "CAN_sniffer/libs/candbc_parser.hpp"
 #include "imgui.h"
 #include "implot.h"
 
@@ -10,7 +11,7 @@
  */
 
 namespace CAN_SNIFFER_WINDOW {
-
+CANDBC_PARSER::DBCParser parser;
 /*
  * --------------------------------------------------------
  * Purpose: Creates a Bar/histogram to show the current values of the decrypted
@@ -220,6 +221,14 @@ Sniffer_window::Sniffer_window() {
  */
 void Sniffer_window::RenderUI() {
   ImGui::Begin("CAN Sniffer Window");
+
+  // backend work
+  // When dbc file has been selected
+  if (!parser.dbcfilepath_.empty()) {
+    // check validity of dbc file
+    parser.load_dbc(parser.dbcfilepath_);
+  }
+
   Bar_plot();
   ShowAppLog();
   ImGui::End();
