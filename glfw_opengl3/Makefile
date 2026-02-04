@@ -17,13 +17,17 @@
 EXE = example_glfw_opengl3
 IMGUI_DIR = ../imgui
 IMPLOT_DIR = ../implot
-IMGUIFILEDIALOG_DIR = ../ImGuiFileDialog 
+IMGUIFILEDIALOG_DIR = ../ImGuiFileDialog
+DBCPPP_DIR = ../dbcppp
+DBCPPP_LIB ?= $(DBCPPP_DIR)/build/libdbcppp.a
+DBCPPP_XMLMM_LIB ?= $(DBCPPP_DIR)/build/third-party/libxmlmm/libxmlmm.dylib
+DBCPPP_XML2_LIB ?= -lxml2
 SRC_DIR = src
 SOURCES = main.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 SOURCES += $(IMPLOT_DIR)/implot.cpp $(IMPLOT_DIR)/implot_items.cpp $(IMPLOT_DIR)/implot_demo.cpp
-SOURCES += $(IMGUIFILEDIALOG_DIR)/ImGuiFileDialog.cpp 
+SOURCES += $(IMGUIFILEDIALOG_DIR)/ImGuiFileDialog.cpp
 
 # pull in every .cpp under src (any depth)
 SOURCES += $(shell find $(SRC_DIR) -name '*.cpp')
@@ -32,9 +36,13 @@ VPATH = . $(IMGUI_DIR) $(IMGUI_DIR)/backends $(IMPLOT_DIR) $(IMGUIFILEDIALOG_DIR
 UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
 
-CXXFLAGS = -std=c++17 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(IMPLOT_DIR) -I$(SRC_DIR) -I$(IMGUIFILEDIALOG_DIR) 
+CXXFLAGS = -std=c++17 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(IMPLOT_DIR) -I$(SRC_DIR) -I$(IMGUIFILEDIALOG_DIR)
+# Prefer local dbcppp headers if present
+ifneq ("$(wildcard $(DBCPPP_DIR)/include/dbcppp/Message.h)","")
+	CXXFLAGS += -I$(DBCPPP_DIR)/include
+endif
 CXXFLAGS += -g -Wall -Wformat
-LIBS =
+LIBS = $(DBCPPP_LIB) $(DBCPPP_XMLMM_LIB) $(DBCPPP_XML2_LIB)
 
 ##---------------------------------------------------------------------
 ## OPENGL ES
@@ -59,7 +67,8 @@ endif
 ifeq ($(UNAME_S), Darwin) #APPLE
 	ECHO_MESSAGE = "Mac OS X"
 	LIBS += -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
-	LIBS += -L/usr/local/lib -L/opt/local/lib -L/opt/homebrew/lib
+	LIBS += -L/usr/local/lib -L/opt/local/lib -L/opt/homebrew/lib -L$(DBCPPP_DIR)/build/third-party/libxmlmm
+	LIBS += -Wl,-rpath,$(DBCPPP_DIR)/build/third-party/libxmlmm
 	#LIBS += -lglfw3
 	LIBS += -lglfw
 
