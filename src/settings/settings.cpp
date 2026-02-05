@@ -111,7 +111,8 @@ void dbc_selector() {
     dbc_file_path.clear();
   }
 
-  if (ImGuiFileDialog::Instance()->Display(DBC_DIALOG_KEY)) {
+  if (ImGuiFileDialog::Instance()->Display(DBC_DIALOG_KEY, ImGuiWindowFlags_None,
+                                          ImVec2(600, 400), ImVec2(900, 600))) {
     if (ImGuiFileDialog::Instance()->IsOk()) {
       dbc_file_path = ImGuiFileDialog::Instance()->GetFilePathName();
     }

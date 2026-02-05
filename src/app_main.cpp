@@ -1,6 +1,7 @@
 #include "app_main.hpp"
 #include "CAN_sniffer/can_sniffer.hpp"
 #include "imgui.h"
+#include "imgui_internal.h" // Required for DockBuilder API
 #include "implot.h"
 #include "plotter/plotter.hpp"
 #include "settings/settings.hpp"
@@ -12,6 +13,7 @@
 namespace MyApp {
 
 bool demo = false;
+static bool first_time_layout = true; // Track if we need to set up default layout
 
 std::vector<SETTINGS::VariableCheckbox> variables;
 CAN_SNIFFER_WINDOW::Sniffer_window sniffer =
@@ -29,6 +31,47 @@ Mode_t mode = Mode_t::NONE;
  * Input : NONE
  * Output: NONE
  */
+
+/*
+ * Purpose: Sets up the default docking layout on first run (when no imgui.ini exists)
+ * This ensures all users start with the same window positions
+ */
+void SetupDefaultDockingLayout(ImGuiID dockspace_id) {
+  // Only run once - check if the dockspace has already been built
+  ImGuiDockNode *node = ImGui::DockBuilderGetNode(dockspace_id);
+  if (node != nullptr && node->IsSplitNode()) {
+    first_time_layout = false;
+    return; // Layout already exists (from imgui.ini or previous run)
+  }
+
+  first_time_layout = false;
+
+  // Clear any existing layout
+  ImGui::DockBuilderRemoveNode(dockspace_id);
+  ImGui::DockBuilderAddNode(dockspace_id,
+                            ImGuiDockNodeFlags_DockSpace);
+  ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->Size);
+
+  // Split the dockspace: left (main area) and right (settings)
+  ImGuiID dock_main_id = dockspace_id;
+  ImGuiID dock_right_id =
+      ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.25f,
+                                  nullptr, &dock_main_id);
+
+  // Split the main area: left-top (sniffer/plotter) and left-bottom (log)
+  ImGuiID dock_bottom_id =
+      ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.2f,
+                                  nullptr, &dock_main_id);
+
+  // Dock the windows to their respective nodes
+  ImGui::DockBuilderDockWindow("Settings Window", dock_right_id);
+  ImGui::DockBuilderDockWindow("CAN Sniffer Window", dock_main_id);
+  ImGui::DockBuilderDockWindow("Plotter Window", dock_main_id);
+  ImGui::DockBuilderDockWindow("Log", dock_bottom_id);
+  ImGui::DockBuilderDockWindow("Example: Log", dock_bottom_id);
+
+  ImGui::DockBuilderFinish(dockspace_id);
+}
 
 void ModeSelector() {
   if (ImGui::BeginPopupModal("mode?", NULL,
@@ -120,6 +163,11 @@ void RenderUI() {
   if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+
+    // Set up the default docking layout on first run
+    if (first_time_layout) {
+      SetupDefaultDockingLayout(dockspace_id);
+    }
   }
 
   // Show demo options and help
