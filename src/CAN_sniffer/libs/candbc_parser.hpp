@@ -30,10 +30,11 @@ public:
 
   // API
   bool load_dbc(const std::string &filepath);
-  bool decode_message();
+  bool is_loaded() const { return loaded_; }
 
 private:
   std::unique_ptr<Vector::DBC::Network> net_;
+  bool loaded_ = false;
 };
 
 } // namespace CANDBC_PARSER

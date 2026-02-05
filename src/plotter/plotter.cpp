@@ -14,7 +14,7 @@ struct Buffer {
   Buffer(int max_size = 2000) {
     MaxSize = max_size;
     Offset = 0;
-    Data.resize(max_size);
+    Data.reserve(max_size);
   }
 
   void AddPoint(float x, float y) {
@@ -23,7 +23,7 @@ struct Buffer {
     } else {
       Data[Offset] = ImVec2(x, y);
       Offset = (Offset + 1) % MaxSize;
-    };
+    }
   }
 };
 

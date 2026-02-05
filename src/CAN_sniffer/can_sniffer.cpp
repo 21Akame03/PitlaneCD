@@ -223,8 +223,8 @@ void Sniffer_window::RenderUI() {
   ImGui::Begin("CAN Sniffer Window");
 
   // backend work
-  // When dbc file has been selected
-  if (!parser.dbcfilepath_.empty()) {
+  // When dbc file has been selected and not yet loaded
+  if (!parser.dbcfilepath_.empty() && !parser.is_loaded()) {
     // check validity of dbc file
     parser.load_dbc(parser.dbcfilepath_);
   }

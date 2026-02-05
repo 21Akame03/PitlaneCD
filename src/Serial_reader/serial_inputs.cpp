@@ -1,7 +1,6 @@
 #include "serial_inputs.hpp"
 
 #include "boost/system/error_code.hpp"
-#include "imgui.h"
 #include <boost/asio.hpp>
 #include <chrono>
 #include <cmath>
@@ -18,17 +17,13 @@ namespace SERIAL {
 SerialReader::SerialReader() : running_(false) {}
 SerialReader::~SerialReader() { Stop(); }
 
-bool errorToastisOn = false;
-// While isConnected is false, we will check for serial port
-bool isConnected = false;
-
 /*
  * Purpose: Start the SerialReader Worker thread
  * Input: portname, baudrate
  * Output: NONE
  */
 bool SerialReader::Start(const std::string &portname, unsigned int baudrate) {
-  // avoid Doubel start
+  // avoid Double start
   bool expected = false;
   if (!running_.compare_exchange_strong(expected, true))
     return false;
@@ -51,15 +46,10 @@ std::string SerialReader::readFromSerialPort(boost::asio::serial_port &serial) {
   // read data
   size_t len = boost::asio::read(serial, boost::asio::buffer(buffer), ec);
 
-  if (ec && !errorToastisOn) {
-    ImGui::Begin("Error");
-    ImGui::Text("Error: %s", ec.message().c_str());
-    ImGui::End();
-    errorToastisOn = true;
-
+  if (ec) {
+    std::lock_guard<std::mutex> lk(error_mtx_);
+    last_error_ = "read: " + ec.message();
     return "";
-  } else {
-    errorToastisOn = false;
   }
 
   return std::string(buffer, len);
@@ -100,21 +90,31 @@ void SerialReader::Run(std::string portname, unsigned int baudrate) {
 
     if (ec) {
       std::lock_guard<std::mutex> lk(error_mtx_);
+      last_error_ = "open: " + ec.message();
+      running_.store(false);
+      return;
+    }
+
+    // Configure baudrate
+    serial.set_option(boost::asio::serial_port_base::baud_rate(baudrate), ec);
+    if (ec) {
+      std::lock_guard<std::mutex> lk(error_mtx_);
       last_error_ = "baudrate: " + ec.message();
       running_.store(false);
       return;
-    };
+    }
 
     // Good practice is to read line by line
     boost::asio::streambuf sb;
     while (running_.load(std::memory_order_acquire)) {
       std::size_t n = boost::asio::read_until(serial, sb, '\n', ec);
+      (void)n; // suppress unused variable warning
 
       if (!running_.load(std::memory_order_acquire))
         break;
       if (ec) {
         std::lock_guard<std::mutex> lk(error_mtx_);
-        last_error_ = "baudrate: " + ec.message();
+        last_error_ = "read: " + ec.message();
       }
 
       // Extract the line from Streambuf

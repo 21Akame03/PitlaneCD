@@ -142,8 +142,8 @@ void RenderUI() {
 
   if (ImGui::BeginListBox("##listbox Variables", ImVec2(-FLT_MIN, -1))) {
     createCheckboxes(MyApp::variables);
+    ImGui::EndListBox();
   }
-  ImGui::EndListBox();
 
   ImGui::End();
 };

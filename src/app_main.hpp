@@ -1,3 +1,5 @@
+#ifndef APP_MAIN_HPP
+#define APP_MAIN_HPP
 
 #include "imgui.h"
 #include "settings/settings.hpp"
@@ -31,3 +33,5 @@ extern Mode_t mode;
 extern std::vector<SETTINGS::VariableCheckbox> variables;
 
 } // namespace MyApp
+
+#endif // APP_MAIN_HPP
