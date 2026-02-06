@@ -14,8 +14,8 @@ namespace MyApp {
 bool demo = false;
 
 std::vector<SETTINGS::VariableCheckbox> variables;
-CAN_SNIFFER_WINDOW::Sniffer_window sniffer =
-    CAN_SNIFFER_WINDOW::Sniffer_window();
+CAN_MODE_WINDOW::Sniffer_window sniffer = CAN_MODE_WINDOW::Sniffer_window();
+CAN_IG::CAN_IG IG = CAN_IG::CAN_IG();
 
 // Mode
 // 1. Plotter / Debug Mode
@@ -194,6 +194,7 @@ void RenderUI() {
   // renders the CAN_SNIFFER VIEW
   case Mode_t::CAN_SNIFFER:
     sniffer.RenderUI();
+    IG.RenderUI();
     break;
 
   case Mode_t::NONE:

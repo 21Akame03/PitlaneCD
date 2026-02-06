@@ -10,7 +10,7 @@
  * 3. has a section where user has to provide a DBC file for decryption
  */
 
-namespace CAN_SNIFFER_WINDOW {
+namespace CAN_MODE_WINDOW {
 CANDBC_PARSER::DBCParser parser;
 /*
  * --------------------------------------------------------
@@ -169,32 +169,27 @@ struct AppLog {
 static void ShowAppLog() {
   static AppLog log;
 
-  // For the demo: add a debug button _BEFORE_ the normal log window contents
-  // We take advantage of a rarely used feature: multiple calls to Begin()/End()
-  // are appending to the _same_ window. Most of the contents of the window will
-  // be added by the log.Draw() call.
-  ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
-  ImGui::Begin("Log");
-  if (ImGui::SmallButton("[Debug] Add 5 entries")) {
-    static int counter = 0;
-    const char *categories[3] = {"info", "warn", "error"};
-    const char *words[] = {"Bumfuzzled",    "Cattywampus",  "Snickersnee",
-                           "Abibliophobia", "Absquatulate", "Nincompoop",
-                           "Pauciloquent"};
-    for (int n = 0; n < 5; n++) {
-      const char *category = categories[counter % IM_COUNTOF(categories)];
-      const char *word = words[counter % IM_COUNTOF(words)];
-      log.AddLog(
-          "[%05d] [%s] Hello, current time is %.1f, here's a word: '%s'\n",
-          ImGui::GetFrameCount(), category, ImGui::GetTime(), word);
-      counter++;
-    }
-  }
-  ImGui::End();
+  // Reference: Example debug button for testing log entries
+  // ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
+  // ImGui::Begin("Log");
+  // if (ImGui::SmallButton("[Debug] Add 5 entries")) {
+  //   static int counter = 0;
+  //   const char *categories[3] = {"info", "warn", "error"};
+  //   const char *words[] = {"Bumfuzzled",    "Cattywampus",  "Snickersnee",
+  //                          "Abibliophobia", "Absquatulate", "Nincompoop",
+  //                          "Pauciloquent"};
+  //   for (int n = 0; n < 5; n++) {
+  //     const char *category = categories[counter % IM_COUNTOF(categories)];
+  //     const char *word = words[counter % IM_COUNTOF(words)];
+  //     log.AddLog(
+  //         "[%05d] [%s] Hello, current time is %.1f, here's a word: '%s'\n",
+  //         ImGui::GetFrameCount(), category, ImGui::GetTime(), word);
+  //     counter++;
+  //   }
+  // }
+  // ImGui::End();
 
-  // Actually call in the regular Log helper (which will Begin() into the same
-  // window as we just did)
-  log.Draw("Example: Log");
+  log.Draw("Log");
 }
 
 /*
@@ -226,7 +221,8 @@ void Sniffer_window::RenderUI() {
   // When dbc file has been selected and not yet loaded
   if (!parser.dbcfilepath_.empty() && !parser.is_loaded()) {
     // check validity of dbc file
-    parser.load_dbc(parser.dbcfilepath_);
+    std::cout << "Loading DBC file" << parser.load_dbc(parser.dbcfilepath_)
+              << std::endl;
   }
 
   Bar_plot();
@@ -234,4 +230,77 @@ void Sniffer_window::RenderUI() {
   ImGui::End();
 }
 
-} // namespace CAN_SNIFFER_WINDOW
+} // namespace CAN_MODE_WINDOW
+
+namespace CAN_IG {
+
+/*
+ * --------------------------------------------------------
+ * Purpose: For each message in DBC File, create a table and allow selection of
+ * the specific signal value Input: NONE Output: NONE
+ * --------------------------------------------------------
+ */
+void CAN_IG::CAN_IG::gen_tables() {
+  static bool selected[10] = {};
+
+  if (ImGui::BeginTable("split1", 3,
+                        ImGuiTableFlags_Resizable |
+                            ImGuiTableFlags_NoSavedSettings |
+                            ImGuiTableFlags_Borders)) {
+    for (int i = 0; i < 10; i++) {
+      char label[32];
+      sprintf(label, "Item %d", i);
+      ImGui::TableNextColumn();
+      ImGui::Selectable(label,
+                        &selected[i]); // FIXME-TABLE: Selection overlap
+    }
+    ImGui::EndTable();
+  }
+  ImGui::Spacing();
+  if (ImGui::BeginTable("split2", 3,
+                        ImGuiTableFlags_Resizable |
+                            ImGuiTableFlags_NoSavedSettings |
+                            ImGuiTableFlags_Borders)) {
+    for (int i = 0; i < 10; i++) {
+      char label[32];
+      sprintf(label, "Item %d", i);
+      ImGui::TableNextRow();
+      ImGui::TableNextColumn();
+      ImGui::Selectable(label, &selected[i],
+                        ImGuiSelectableFlags_SpanAllColumns);
+      ImGui::TableNextColumn();
+      ImGui::Text("Some other contents");
+      ImGui::TableNextColumn();
+      ImGui::Text("123456");
+    }
+    ImGui::EndTable();
+  }
+};
+
+/*
+ * --------------------------------------------------------
+ * Purpose: Defines Context in case context is not created
+ * value Input: NONE
+ * Output: NONE
+ * --------------------------------------------------------
+ */
+CAN_IG::CAN_IG() {
+  // Ensure an ImPlot context exists once; ImGui context is created in main.
+  if (ImPlot::GetCurrentContext() == nullptr) {
+    ImPlot::CreateContext();
+  }
+}
+
+void CAN_IG::CAN_IG::RenderUI() {
+  if (CAN_MODE_WINDOW::parser.is_loaded()) {
+    ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
+    ImGui::Begin("CAN IG Tables");
+    ImGui::BeginChild("TablesScroll", ImVec2(0, 0), ImGuiChildFlags_None,
+                      ImGuiWindowFlags_AlwaysVerticalScrollbar);
+    this->gen_tables();
+    ImGui::EndChild();
+    ImGui::End();
+  }
+}
+
+} // namespace CAN_IG
