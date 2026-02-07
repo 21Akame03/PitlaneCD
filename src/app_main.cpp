@@ -1,5 +1,6 @@
 #include "app_main.hpp"
 #include "CAN_sniffer/can_sniffer.hpp"
+#include "Serial_reader/serial_inputs.hpp"
 #include "imgui.h"
 #include "implot.h"
 #include "plotter/plotter.hpp"
@@ -16,6 +17,9 @@ bool demo = false;
 std::vector<SETTINGS::VariableCheckbox> variables;
 CAN_MODE_WINDOW::Sniffer_window sniffer = CAN_MODE_WINDOW::Sniffer_window();
 CAN_IG::CAN_IG IG = CAN_IG::CAN_IG();
+
+// Serial Reader obj
+SERIAL::SerialReader serialReader = SERIAL::SerialReader();
 
 // Mode
 // 1. Plotter / Debug Mode
@@ -175,6 +179,7 @@ void RenderUI() {
   // 1. Serial Comm port reader and saving the data
   // 2. The plotter which will take the data and show it on the Settings windows
 
+  // USER CODE AS FROM HERE
   if (MyApp::mode == Mode_t::NONE) {
     ModeSelector();
   }

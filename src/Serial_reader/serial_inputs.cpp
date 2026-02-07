@@ -34,28 +34,6 @@ bool SerialReader::Start(const std::string &portname, unsigned int baudrate) {
 }
 
 /*
- * Purpose: Reads serial data and stores in a buffer
- * Input: boost::asio::serial_port
- * Output: String
- */
-std::string SerialReader::readFromSerialPort(boost::asio::serial_port &serial) {
-  // to store incoming data
-  char buffer[100];
-  boost::system::error_code ec;
-
-  // read data
-  size_t len = boost::asio::read(serial, boost::asio::buffer(buffer), ec);
-
-  if (ec) {
-    std::lock_guard<std::mutex> lk(error_mtx_);
-    last_error_ = "read: " + ec.message();
-    return "";
-  }
-
-  return std::string(buffer, len);
-}
-
-/*
  * Purpose: Return the data buffer from SerialReader to the UI
  */
 std::deque<std::string> SerialReader::PollRxBuffer() {
@@ -104,6 +82,12 @@ void SerialReader::Run(std::string portname, unsigned int baudrate) {
       return;
     }
 
+    // Register so Stop() can cancel the blocking read
+    {
+      std::lock_guard<std::mutex> lk(serial_mtx_);
+      active_serial_ = &serial;
+    }
+
     // Good practice is to read line by line
     boost::asio::streambuf sb;
     while (running_.load(std::memory_order_acquire)) {
@@ -115,6 +99,7 @@ void SerialReader::Run(std::string portname, unsigned int baudrate) {
       if (ec) {
         std::lock_guard<std::mutex> lk(error_mtx_);
         last_error_ = "read: " + ec.message();
+        break;
       }
 
       // Extract the line from Streambuf
@@ -132,9 +117,21 @@ void SerialReader::Run(std::string portname, unsigned int baudrate) {
         }
       }
     }
+
+    // Unregister before serial goes out of scope
+    {
+      std::lock_guard<std::mutex> lk(serial_mtx_);
+      active_serial_ = nullptr;
+    }
   } catch (std::exception &e) {
-    std::lock_guard<std::mutex> lk(error_mtx_);
-    std::cout << "Exception: " << e.what() << "\n";
+    {
+      std::lock_guard<std::mutex> lk(serial_mtx_);
+      active_serial_ = nullptr;
+    }
+    {
+      std::lock_guard<std::mutex> lk(error_mtx_);
+      last_error_ = "Exception: " + std::string(e.what());
+    }
   }
 }
 
@@ -144,6 +141,15 @@ void SerialReader::Run(std::string portname, unsigned int baudrate) {
 void SerialReader::Stop() {
   if (!running_.exchange(false))
     return;
+  // Cancel the blocking read so the thread can exit
+  {
+    std::lock_guard<std::mutex> lk(serial_mtx_);
+    if (active_serial_) {
+      boost::system::error_code ec;
+      active_serial_->cancel(ec);
+      active_serial_->close(ec);
+    }
+  }
   if (serial_thread_.joinable()) {
     serial_thread_.join();
   }

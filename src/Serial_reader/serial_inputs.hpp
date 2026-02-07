@@ -15,10 +15,6 @@ public:
   void Run(std::string portname, unsigned int baudrate);
   void Stop();
   bool IsRunning() const;
-  void configureSerialPort(boost::asio::serial_port &serial,
-                           const std::string &portname, unsigned int baudrate);
-  std::string readFromSerialPort(boost::asio::serial_port &serial);
-
   // called from UI
   std::deque<std::string> PollRxBuffer();
 
@@ -28,7 +24,6 @@ public:
 private:
   std::atomic<bool> running_;
 
-  void ReaderLoop(std::string portname, unsigned int baudrate);
   std::thread serial_thread_;
 
   // producer (worker ) -> consumer(UI)
@@ -38,6 +33,10 @@ private:
   // Error reporting (Worker sets, UI read)
   std::mutex error_mtx_;
   std::string last_error_;
+
+  // Active serial port (for cancellation on Stop)
+  std::mutex serial_mtx_;
+  boost::asio::serial_port *active_serial_ = nullptr;
 };
 
 } // namespace SERIAL
