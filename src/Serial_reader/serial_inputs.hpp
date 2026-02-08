@@ -34,9 +34,10 @@ private:
   std::mutex error_mtx_;
   std::string last_error_;
 
-  // Active serial port (for cancellation on Stop)
+  // Active serial port and io_context (for cancellation on Stop)
   std::mutex serial_mtx_;
   boost::asio::serial_port *active_serial_ = nullptr;
+  boost::asio::io_context *active_io_ = nullptr;
 };
 
 } // namespace SERIAL

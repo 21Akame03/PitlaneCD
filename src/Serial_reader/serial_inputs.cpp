@@ -4,6 +4,7 @@
 #include <boost/asio.hpp>
 #include <chrono>
 #include <cmath>
+#include <functional>
 #include <iostream>
 #include <thread>
 
@@ -82,51 +83,62 @@ void SerialReader::Run(std::string portname, unsigned int baudrate) {
       return;
     }
 
-    // Register so Stop() can cancel the blocking read
+    // Register so Stop() can cancel async ops and stop the io_context
     {
       std::lock_guard<std::mutex> lk(serial_mtx_);
       active_serial_ = &serial;
+      active_io_ = &io;
     }
 
-    // Good practice is to read line by line
+    // Use async I/O so that Stop() can actually cancel pending reads
     boost::asio::streambuf sb;
-    while (running_.load(std::memory_order_acquire)) {
-      std::size_t n = boost::asio::read_until(serial, sb, '\n', ec);
-      (void)n; // suppress unused variable warning
 
-      if (!running_.load(std::memory_order_acquire))
-        break;
-      if (ec) {
-        std::lock_guard<std::mutex> lk(error_mtx_);
-        last_error_ = "read: " + ec.message();
-        break;
-      }
+    std::function<void()> do_read;
+    do_read = [&]() {
+      boost::asio::async_read_until(
+          serial, sb, '\n',
+          [&](boost::system::error_code ec, std::size_t /*n*/) {
+            if (ec || !running_.load(std::memory_order_acquire)) {
+              if (ec && ec != boost::asio::error::operation_aborted) {
+                std::lock_guard<std::mutex> lk(error_mtx_);
+                last_error_ = "read: " + ec.message();
+              }
+              return;
+            }
 
-      // Extract the line from Streambuf
-      std::istream is(&sb);
-      std::string line;
-      std::getline(is, line); // removes '\n'
+            // Extract the line from Streambuf
+            std::istream is(&sb);
+            std::string line;
+            std::getline(is, line); // removes '\n'
 
-      {
-        std::lock_guard<std::mutex> lk(rx_mtx_); // lock the buffer
-        rx_buffer_.push_back(std::move(line));
+            {
+              std::lock_guard<std::mutex> lk(rx_mtx_);
+              rx_buffer_.push_back(std::move(line));
 
-        // limit queue to 2000
-        if (rx_buffer_.size() > 2000) {
-          rx_buffer_.pop_front();
-        }
-      }
-    }
+              // limit queue to 2000
+              if (rx_buffer_.size() > 2000) {
+                rx_buffer_.pop_front();
+              }
+            }
+
+            do_read(); // schedule next async read
+          });
+    };
+
+    do_read();
+    io.run(); // blocks until all async ops complete or io is stopped
 
     // Unregister before serial goes out of scope
     {
       std::lock_guard<std::mutex> lk(serial_mtx_);
       active_serial_ = nullptr;
+      active_io_ = nullptr;
     }
   } catch (std::exception &e) {
     {
       std::lock_guard<std::mutex> lk(serial_mtx_);
       active_serial_ = nullptr;
+      active_io_ = nullptr;
     }
     {
       std::lock_guard<std::mutex> lk(error_mtx_);
@@ -141,13 +153,15 @@ void SerialReader::Run(std::string portname, unsigned int baudrate) {
 void SerialReader::Stop() {
   if (!running_.exchange(false))
     return;
-  // Cancel the blocking read so the thread can exit
+  // Cancel pending async reads and stop the io_context so the thread can exit
   {
     std::lock_guard<std::mutex> lk(serial_mtx_);
     if (active_serial_) {
       boost::system::error_code ec;
       active_serial_->cancel(ec);
-      active_serial_->close(ec);
+    }
+    if (active_io_) {
+      active_io_->stop();
     }
   }
   if (serial_thread_.joinable()) {

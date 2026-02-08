@@ -1,6 +1,7 @@
 #ifndef CANDBC_PARSER_HPP
 #define CANDBC_PARSER_HPP
 
+#include <optional>
 #include <vector>
 #pragma once
 
@@ -16,12 +17,11 @@ namespace CANDBC_PARSER {
 struct can_frame_t {
   uint32_t id;
   uint8_t dlc;
-  uint8_t __pad;
-  uint8_t __res0;
-  uint8_t __res1;
-  uint8_t data[8];
+  double value;
   std::string name;
 };
+
+// FIX: We need to place this somewhere else
 
 class DBCParser {
 
@@ -34,8 +34,8 @@ public:
   // API
   bool load_dbc(const std::string &filepath);
   bool is_loaded() const { return loaded_; }
-  bool parse_frame();
-  nlohmann::json parse_json();
+  std::optional<can_frame_t> parse_frame(std::string data);
+  nlohmann::json parse_json(std::string data);
 
 private:
   std::vector<uint8_t> HexStringtoBytes(std::string hex);

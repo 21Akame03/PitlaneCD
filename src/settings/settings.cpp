@@ -20,8 +20,7 @@ static bool ispollActive = false;
 static std::string dbc_file_path;
 static const char *DBC_DIALOG_KEY = "dbc_file_dialog";
 
-// Serial Reader object
-static SERIAL::SerialReader serialReader;
+// Use the shared serial reader from MyApp (consumed by ShowAppLog)
 
 void createCheckboxes(std::vector<VariableCheckbox> &variables) {
   // we creake the checkboxes
@@ -71,9 +70,9 @@ void connection_selector() {
 
   // So long as ispollActive is true, start the serial reader
   if (ispollActive) {
-    serialReader.Start(com_ports[current_port], 115200);
+    MyApp::serialReader.Start(com_ports[current_port], 115200);
   } else {
-    serialReader.Stop();
+    MyApp::serialReader.Stop();
   }
 }
 
