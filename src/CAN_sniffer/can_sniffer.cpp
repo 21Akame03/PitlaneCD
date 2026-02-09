@@ -3,8 +3,11 @@
 #include "app_main.hpp"
 #include "imgui.h"
 #include "implot.h"
+#include <cstdio>
 #include <deque>
 #include <ostream>
+#include <string>
+#include <vector>
 
 /*
  * Shares similar viewport as normal Debug Plotter with some additions:
@@ -91,13 +94,94 @@ AppLog log;
  * Output: NONE
  * --------------------------------------------------------
  */
-void Bar_plot() {
-  // Test data for visualisation test
-  static ImS8 data[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-  if (ImPlot::BeginPlot("CAN Messages")) {
-    ImPlot::PlotBars("Value", data, 10, 0, 7, 1);
+// Helper: render a bar plot for a list of signals with hover tooltips
+static void RenderSignalBarPlot(const char *plotTitle,
+                                const std::vector<std::pair<uint32_t, const CANDBC_PARSER::SignalValue *>> &signals) {
+  if (signals.empty())
+    return;
+
+  // Collect tick labels and positions
+  std::vector<double> positions;
+  std::vector<const char *> labels;
+  std::vector<double> values;
+  for (int i = 0; i < (int)signals.size(); i++) {
+    positions.push_back(i);
+    labels.push_back(signals[i].second->name.c_str());
+    values.push_back(signals[i].second->physicalValue);
+  }
+
+  static const double barWidth = 0.6;
+  float plotHeight = 120.0f;
+  if (ImPlot::BeginPlot(plotTitle, ImVec2(-1, plotHeight))) {
+    ImPlot::SetupAxes(nullptr, "Value");
+    ImPlot::SetupAxis(ImAxis_X1, nullptr, ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoTickMarks);
+    ImPlot::SetupAxisLimits(ImAxis_X1, -0.5, (double)signals.size() - 0.5, ImPlotCond_Always);
+    // Auto-fit Y axis to data range with padding
+    double yMin = 0, yMax = 0;
+    for (double v : values) {
+      if (v < yMin) yMin = v;
+      if (v > yMax) yMax = v;
+    }
+    double yPad = (yMax - yMin) * 0.1;
+    if (yPad < 1.0) yPad = 1.0;
+    ImPlot::SetupAxisLimits(ImAxis_Y1, yMin - yPad, yMax + yPad, ImPlotCond_Always);
+
+    ImPlot::PlotBars("Signals", positions.data(), values.data(),
+                     (int)signals.size(), barWidth);
+
+    // Hover tooltip: determine which bar the mouse is over
+    if (ImPlot::IsPlotHovered()) {
+      ImPlotPoint mouse = ImPlot::GetPlotMousePos();
+      int idx = (int)(mouse.x + 0.5);
+      if (idx >= 0 && idx < (int)signals.size()) {
+        double barLeft = positions[idx] - barWidth / 2.0;
+        double barRight = positions[idx] + barWidth / 2.0;
+        if (mouse.x >= barLeft && mouse.x <= barRight) {
+          ImGui::BeginTooltip();
+          ImGui::Text("Signal: %s", signals[idx].second->name.c_str());
+          ImGui::Text("Value:  %.2f %s", signals[idx].second->physicalValue,
+                       signals[idx].second->unit.c_str());
+          ImGui::Text("Raw:    0x%X", signals[idx].second->rawValue);
+          ImGui::Text("Msg ID: 0x%X", signals[idx].first);
+          ImGui::EndTooltip();
+        }
+      }
+    }
     ImPlot::EndPlot();
   }
+}
+
+void Bar_plot() {
+  // Partition signals into multiplexed messages and non-multiplexed
+  std::vector<std::pair<uint32_t, const CANDBC_PARSER::MessageData *>> multiplexed_msgs;
+  std::vector<std::pair<uint32_t, const CANDBC_PARSER::SignalValue *>> non_mux_signals;
+
+  for (const auto &entry : CANDBC_PARSER::signal_store) {
+    const auto &msgData = entry.second;
+    if (msgData.hasMultiplexedSignals) {
+      multiplexed_msgs.push_back({entry.first, &msgData});
+    } else {
+      for (const auto &sig : msgData.signals) {
+        non_mux_signals.push_back({msgData.id, &sig.second});
+      }
+    }
+  }
+
+  // Render individual plots for each multiplexed message
+  for (const auto &muxMsg : multiplexed_msgs) {
+    char title[128];
+    snprintf(title, sizeof(title), "%s (0x%X)", muxMsg.second->name.c_str(),
+             muxMsg.second->id);
+
+    std::vector<std::pair<uint32_t, const CANDBC_PARSER::SignalValue *>> sigs;
+    for (const auto &sig : muxMsg.second->signals) {
+      sigs.push_back({muxMsg.second->id, &sig.second});
+    }
+    RenderSignalBarPlot(title, sigs);
+  }
+
+  // Render one combined plot for all non-multiplexed signals
+  RenderSignalBarPlot("Non-Multiplexed Signals", non_mux_signals);
 }
 
 /*

@@ -8,6 +8,7 @@
 #include "nlohmann/json.hpp"
 #include <Vector/DBC/Network.h>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -21,7 +22,23 @@ struct can_frame_t {
   std::string name;
 };
 
-// FIX: We need to place this somewhere else
+struct SignalValue {
+    std::string name;
+    double physicalValue;
+    unsigned int rawValue;
+    std::string unit;
+    bool isMultiplexed;
+};
+
+struct MessageData {
+    std::string name;
+    uint32_t id;
+    bool hasMultiplexedSignals = false;
+    std::map<std::string, SignalValue> signals;
+};
+
+// Stores latest decoded values per message ID
+extern std::map<uint32_t, MessageData> signal_store;
 
 class DBCParser {
 

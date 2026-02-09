@@ -16,15 +16,9 @@
 #include <Vector/DBC.h>
 #include <vector>
 
-std::map<uint32_t, CANDBC_PARSER::can_frame_t> can_frame_list;
-
-bool addtocanframelist(uint32_t id, std::string name, double physicalValue) {
-  // check if the signal is already in the list
-  if (can_frame_list.find(id) != can_frame_list.end()) {
-  }
-}
-
 namespace CANDBC_PARSER {
+
+std::map<uint32_t, MessageData> signal_store;
 
 // Constructor
 DBCParser::DBCParser() {};
@@ -141,6 +135,11 @@ std::optional<can_frame_t> DBCParser::parse_frame(std::string data) {
   }
   CAN_MODE_WINDOW::log.AddLog("Message: %s\n", message->name.c_str());
 
+  // Initialize message data in signal store
+  auto &msgData = signal_store[id];
+  msgData.name = message->name;
+  msgData.id = id;
+
   // loop over the message to find multiplexor
   unsigned int multiplexerSwitchValue = 0;
   for (const auto &signal : message->signals) {
@@ -160,18 +159,29 @@ std::optional<can_frame_t> DBCParser::parse_frame(std::string data) {
       unsigned int rawValue = signal.second.decode(can_data);
       CAN_MODE_WINDOW::log.AddLog("  Signal (MultiplexorSwitch) %s  Raw: 0x%X\n",
                                   signal.second.name.c_str(), rawValue);
+      msgData.hasMultiplexedSignals = true;
+      msgData.signals[signal.second.name] = {
+          signal.second.name, static_cast<double>(rawValue), rawValue,
+          signal.second.unit, true};
     } break;
     case Vector::DBC::Signal::Multiplexor::MultiplexedSignal: {
       unsigned int rawValue = signal.second.decode(can_data);
       double physicalValue = signal.second.rawToPhysicalValue(rawValue);
       CAN_MODE_WINDOW::log.AddLog("  Signal (MultiplexedSignal) %s  Raw: 0x%X  Physical: %.2f\n",
                                   signal.second.name.c_str(), rawValue, physicalValue);
+      msgData.hasMultiplexedSignals = true;
+      msgData.signals[signal.second.name] = {
+          signal.second.name, physicalValue, rawValue,
+          signal.second.unit, true};
     } break;
     case Vector::DBC::Signal::Multiplexor::NoMultiplexor: {
       unsigned int rawValue = signal.second.decode(can_data);
       double physicalValue = signal.second.rawToPhysicalValue(rawValue);
       CAN_MODE_WINDOW::log.AddLog("  Signal %s  Raw: 0x%X  Physical: %.2f\n",
                                   signal.second.name.c_str(), rawValue, physicalValue);
+      msgData.signals[signal.second.name] = {
+          signal.second.name, physicalValue, rawValue,
+          signal.second.unit, false};
     } break;
     }
   }
