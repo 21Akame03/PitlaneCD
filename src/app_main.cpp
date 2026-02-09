@@ -1,5 +1,6 @@
 #include "app_main.hpp"
 #include "CAN_sniffer/can_sniffer.hpp"
+#include "Serial_reader/serial_inputs.hpp"
 #include "imgui.h"
 #include "imgui_internal.h" // Required for DockBuilder API
 #include "implot.h"
@@ -16,8 +17,11 @@ bool demo = false;
 static bool first_time_layout = true; // Track if we need to set up default layout
 
 std::vector<SETTINGS::VariableCheckbox> variables;
-CAN_SNIFFER_WINDOW::Sniffer_window sniffer =
-    CAN_SNIFFER_WINDOW::Sniffer_window();
+CAN_MODE_WINDOW::Sniffer_window sniffer = CAN_MODE_WINDOW::Sniffer_window();
+CAN_IG::CAN_IG IG = CAN_IG::CAN_IG();
+
+// Serial Reader obj
+SERIAL::SerialReader serialReader = SERIAL::SerialReader();
 
 // Mode
 // 1. Plotter / Debug Mode
@@ -223,6 +227,7 @@ void RenderUI() {
   // 1. Serial Comm port reader and saving the data
   // 2. The plotter which will take the data and show it on the Settings windows
 
+  // USER CODE AS FROM HERE
   if (MyApp::mode == Mode_t::NONE) {
     ModeSelector();
   }
@@ -242,6 +247,7 @@ void RenderUI() {
   // renders the CAN_SNIFFER VIEW
   case Mode_t::CAN_SNIFFER:
     sniffer.RenderUI();
+    IG.RenderUI();
     break;
 
   case Mode_t::NONE:

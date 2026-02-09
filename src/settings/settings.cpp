@@ -20,8 +20,7 @@ static bool ispollActive = false;
 static std::string dbc_file_path;
 static const char *DBC_DIALOG_KEY = "dbc_file_dialog";
 
-// Serial Reader object
-static SERIAL::SerialReader serialReader;
+// Use the shared serial reader from MyApp (consumed by ShowAppLog)
 
 void createCheckboxes(std::vector<VariableCheckbox> &variables) {
   // we creake the checkboxes
@@ -71,9 +70,9 @@ void connection_selector() {
 
   // So long as ispollActive is true, start the serial reader
   if (ispollActive) {
-    serialReader.Start(com_ports[current_port], 115200);
+    MyApp::serialReader.Start(com_ports[current_port], 115200);
   } else {
-    serialReader.Stop();
+    MyApp::serialReader.Stop();
   }
 }
 
@@ -132,9 +131,9 @@ void RenderUI() {
     // Data Parser through CAN
     // check if dbc file has been selected
     if (!dbc_file_path.empty() &&
-        CAN_SNIFFER_WINDOW::parser.dbcfilepath_.empty()) {
+        CAN_MODE_WINDOW::parser.dbcfilepath_.empty()) {
       // run the CAN_sniffer and data parser subroutines
-      CAN_SNIFFER_WINDOW::parser.dbcfilepath_ = dbc_file_path;
+      CAN_MODE_WINDOW::parser.dbcfilepath_ = dbc_file_path;
     }
   }
 

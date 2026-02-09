@@ -1,6 +1,7 @@
 #ifndef APP_MAIN_HPP
 #define APP_MAIN_HPP
 
+#include "Serial_reader/serial_inputs.hpp"
 #include "imgui.h"
 #include "settings/settings.hpp"
 #include <string>
@@ -31,7 +32,7 @@ extern Mode_t mode;
 
 // To avoid ODR violations, do not define this anywhere else
 extern std::vector<SETTINGS::VariableCheckbox> variables;
-
+extern SERIAL::SerialReader serialReader;
 } // namespace MyApp
 
 #endif // APP_MAIN_HPP

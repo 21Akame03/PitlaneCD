@@ -31,7 +31,12 @@ FetchContent_Declare(
   GIT_REPOSITORY https://bitbucket.org/tobylorenz/vector_dbc.git
   GIT_TAG master
 )
-FetchContent_MakeAvailable(imgui implot ImGuiFileDialog vector_dbc)
+FetchContent_Declare (
+  nl_json
+  GIT_REPOSITORY https://github.com/nlohmann/json.git
+  GIT_TAG v3.12.0
+)
+FetchContent_MakeAvailable(imgui implot ImGuiFileDialog vector_dbc nl_json)
 
 # Ensure vector_dbc finds its own headers when used as a subproject
 if(TARGET Vector_DBC)
@@ -110,6 +115,7 @@ target_link_libraries(glfw_opengl3 PRIVATE
   OpenGL::GL
   ${GLFW_TARGET}
   Vector_DBC
+  nlohmann_json::nlohmann_json
 )
 
 if(APPLE)
