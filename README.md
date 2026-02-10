@@ -23,7 +23,7 @@ Compatible with **ESP32** and **STM32** (and generally anything that can stream 
 
 ```bash
 # Configure and build
-cmake -B build -G Ninja -DFLEX_INCLUDE_DIR=/Library/Developer/CommandLineTools/usr/include
+cmake -B build -G Ninja -DFLEX_INCLUDE_DIR=/Library/Developer/CommandLineTools/usr/include -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build
 
 # Run

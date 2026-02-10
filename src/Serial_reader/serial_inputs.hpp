@@ -18,6 +18,9 @@ public:
   // called from UI
   std::deque<std::string> PollRxBuffer();
 
+  // called from UI: send data over serial
+  void Send(const std::string &data);
+
   // called from UI: get and clear last error
   std::string ConsumeLastError();
 

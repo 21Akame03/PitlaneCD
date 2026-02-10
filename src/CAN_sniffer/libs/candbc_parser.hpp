@@ -8,6 +8,7 @@
 #include "nlohmann/json.hpp"
 #include <Vector/DBC/Network.h>
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -21,7 +22,24 @@ struct can_frame_t {
   std::string name;
 };
 
-// FIX: We need to place this somewhere else
+struct SignalValue {
+    std::string name;
+    double physicalValue;
+    unsigned int rawValue;
+    std::string unit;
+    bool isMultiplexed;
+};
+
+struct MessageData {
+    std::string name;
+    uint32_t id;
+    bool hasMultiplexedSignals = false;
+    std::map<std::string, SignalValue> signals;
+    std::vector<uint8_t> lastFrameData;
+};
+
+// Stores latest decoded values per message ID
+extern std::map<uint32_t, MessageData> signal_store;
 
 class DBCParser {
 
@@ -36,6 +54,10 @@ public:
   bool is_loaded() const { return loaded_; }
   std::optional<can_frame_t> parse_frame(std::string data);
   nlohmann::json parse_json(std::string data);
+  const std::map<uint32_t, Vector::DBC::Message>& getMessages() const {
+      static const std::map<uint32_t, Vector::DBC::Message> empty;
+      return loaded_ ? net_->messages : empty;
+  }
 
 private:
   std::vector<uint8_t> HexStringtoBytes(std::string hex);

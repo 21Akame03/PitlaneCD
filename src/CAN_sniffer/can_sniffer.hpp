@@ -58,8 +58,16 @@ public:
   CAN_IG();
   void RenderUI();
 
+  // Currently selected signal (set by user clicking in the IG table)
+  bool hasSelection = false;
+  uint32_t selectedMsgId = 0;
+  std::string selectedSignalName;
+
+  // Physical value entered by user for sending
+  double inputValue = 0.0;
+
 private:
-  static void gen_tables();
+  void gen_tables();
 };
 } // namespace CAN_IG
 #endif
