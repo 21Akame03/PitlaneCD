@@ -21,6 +21,7 @@
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 #include "app_main.hpp"
+#include "default_imgui_ini.hpp"
 #include "implot.h"
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to
@@ -172,6 +173,18 @@ int main(int, char **) {
   // ImFont* font =
   // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf");
   // IM_ASSERT(font != nullptr);
+
+  // Load embedded default layout if no imgui.ini exists on disk.
+  // This ensures a clean build still starts with the correct docking layout.
+  {
+    FILE *f = fopen(io.IniFilename ? io.IniFilename : "imgui.ini", "r");
+    if (f) {
+      fclose(f);
+    } else {
+      ImGui::LoadIniSettingsFromMemory(kDefaultImGuiIni,
+                                       sizeof(kDefaultImGuiIni) - 1);
+    }
+  }
 
   // Our state
   bool show_demo_window = true;

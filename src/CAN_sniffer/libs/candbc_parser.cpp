@@ -139,6 +139,7 @@ std::optional<can_frame_t> DBCParser::parse_frame(std::string data) {
   auto &msgData = signal_store[id];
   msgData.name = message->name;
   msgData.id = id;
+  msgData.lastFrameData = can_data;
 
   // loop over the message to find multiplexor
   unsigned int multiplexerSwitchValue = 0;

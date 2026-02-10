@@ -4,9 +4,11 @@
 #include "imgui.h"
 #include "implot.h"
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <deque>
+#include <limits>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -278,8 +280,8 @@ namespace CAN_IG {
  * --------------------------------------------------------
  */
 void CAN_IG::CAN_IG::gen_tables() {
-  const auto *messages = CAN_MODE_WINDOW::parser.getMessages();
-  if (!messages || messages->empty()) {
+  const auto &messages = CAN_MODE_WINDOW::parser.getMessages();
+  if (messages.empty()) {
     ImGui::TextDisabled("No DBC messages loaded...");
     return;
   }
@@ -292,7 +294,7 @@ void CAN_IG::CAN_IG::gen_tables() {
     ImGui::Separator();
   }
 
-  for (const auto &[msgId, msg] : *messages) {
+  for (const auto &[msgId, msg] : messages) {
     // Tree node per message: "MessageName (0xID) - N signals"
     char header[128];
     snprintf(header, sizeof(header), "%s (0x%X) - %zu signals",
@@ -331,13 +333,21 @@ void CAN_IG::CAN_IG::gen_tables() {
                   size_t ia = 0, ib = 0;
                   while (ia < sa.size() && ib < sb.size()) {
                     if (std::isdigit(sa[ia]) && std::isdigit(sb[ib])) {
-                      // Compare numeric segments by value
                       size_t na = ia, nb = ib;
                       while (na < sa.size() && std::isdigit(sa[na])) na++;
                       while (nb < sb.size() && std::isdigit(sb[nb])) nb++;
-                      unsigned long va = std::stoul(sa.substr(ia, na - ia));
-                      unsigned long vb = std::stoul(sb.substr(ib, nb - ib));
-                      if (va != vb) return va < vb;
+                      size_t lenA = na - ia, lenB = nb - ib;
+                      constexpr size_t maxDigits = 18;
+                      if (lenA > maxDigits || lenB > maxDigits) {
+                        // Too long for stoul: compare by length then lexicographically
+                        if (lenA != lenB) return lenA < lenB;
+                        int cmp = sa.compare(ia, lenA, sb, ib, lenB);
+                        if (cmp != 0) return cmp < 0;
+                      } else {
+                        unsigned long va = std::stoul(sa.substr(ia, lenA));
+                        unsigned long vb = std::stoul(sb.substr(ib, lenB));
+                        if (va != vb) return va < vb;
+                      }
                       ia = na; ib = nb;
                     } else {
                       if (sa[ia] != sb[ib]) return sa[ia] < sb[ib];
@@ -402,13 +412,13 @@ void CAN_IG::CAN_IG::RenderUI() {
   if (hasSelection) {
     ImGui::Separator();
 
-    const auto *messages = CAN_MODE_WINDOW::parser.getMessages();
+    const auto &messages = CAN_MODE_WINDOW::parser.getMessages();
     const Vector::DBC::Signal *selSignal = nullptr;
     const Vector::DBC::Message *selMsg = nullptr;
 
-    if (messages) {
-      auto msgIt = messages->find(selectedMsgId);
-      if (msgIt != messages->end()) {
+    {
+      auto msgIt = messages.find(selectedMsgId);
+      if (msgIt != messages.end()) {
         selMsg = &msgIt->second;
         auto sigIt = msgIt->second.signals.find(selectedSignalName);
         if (sigIt != msgIt->second.signals.end()) {
@@ -437,29 +447,43 @@ void CAN_IG::CAN_IG::RenderUI() {
         // 1. Convert physical value to raw
         double rawValue = selSignal->physicalToRawValue(inputValue);
 
-        // 2. Create zero-initialized CAN data buffer
-        std::vector<uint8_t> buffer(selMsg->size, 0);
+        // 2. Validate rawValue before casting (NaN / out-of-range for int64_t)
+        constexpr double kInt64Min = static_cast<double>(std::numeric_limits<int64_t>::min());
+        constexpr double kInt64Max = static_cast<double>(std::numeric_limits<int64_t>::max());
+        if (std::isnan(rawValue) || rawValue < kInt64Min || rawValue > kInt64Max) {
+          ImGui::SameLine();
+          ImGui::TextColored(ImVec4(1, 0, 0, 1), "Raw value out of range!");
+        } else {
+          // 3. Initialize buffer from last-known frame data to preserve other signals
+          std::vector<uint8_t> buffer(selMsg->size, 0);
+          auto storeIt = CANDBC_PARSER::signal_store.find(selectedMsgId);
+          if (storeIt != CANDBC_PARSER::signal_store.end() &&
+              !storeIt->second.lastFrameData.empty()) {
+            buffer = storeIt->second.lastFrameData;
+            buffer.resize(selMsg->size, 0);
+          }
 
-        // 3. Encode raw value into the buffer at the signal's bit position
-        // encode() expects uint64_t
-        uint64_t rawU64 = static_cast<uint64_t>(static_cast<int64_t>(rawValue));
-        const_cast<Vector::DBC::Signal*>(selSignal)->encode(buffer, rawU64);
+          // 4. Encode raw value into the buffer using a local Signal copy
+          uint64_t rawU64 = static_cast<uint64_t>(static_cast<int64_t>(rawValue));
+          Vector::DBC::Signal localSignal = *selSignal;
+          localSignal.encode(buffer, rawU64);
 
-        // 4. Convert buffer to hex string
-        std::string hexData;
-        hexData.reserve(buffer.size() * 2);
-        for (uint8_t byte : buffer) {
-          char hex[3];
-          snprintf(hex, sizeof(hex), "%02X", byte);
-          hexData += hex;
+          // 5. Convert buffer to hex string
+          std::string hexData;
+          hexData.reserve(buffer.size() * 2);
+          for (uint8_t byte : buffer) {
+            char hex[3];
+            snprintf(hex, sizeof(hex), "%02X", byte);
+            hexData += hex;
+          }
+
+          // 6. Build JSON and send
+          nlohmann::json j;
+          j["id"] = selMsg->id;
+          j["data"] = hexData;
+          std::string jsonStr = j.dump() + "\n";
+          MyApp::serialReader.Send(jsonStr);
         }
-
-        // 5. Build JSON and send
-        nlohmann::json j;
-        j["id"] = selMsg->id;
-        j["data"] = hexData;
-        std::string jsonStr = j.dump() + "\n";
-        MyApp::serialReader.Send(jsonStr);
       }
     } else {
       ImGui::TextDisabled("Selected signal no longer found in DBC.");

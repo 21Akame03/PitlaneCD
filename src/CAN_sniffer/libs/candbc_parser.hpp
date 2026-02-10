@@ -35,6 +35,7 @@ struct MessageData {
     uint32_t id;
     bool hasMultiplexedSignals = false;
     std::map<std::string, SignalValue> signals;
+    std::vector<uint8_t> lastFrameData;
 };
 
 // Stores latest decoded values per message ID
@@ -53,8 +54,9 @@ public:
   bool is_loaded() const { return loaded_; }
   std::optional<can_frame_t> parse_frame(std::string data);
   nlohmann::json parse_json(std::string data);
-  const std::map<uint32_t, Vector::DBC::Message>* getMessages() const {
-      return loaded_ ? &net_->messages : nullptr;
+  const std::map<uint32_t, Vector::DBC::Message>& getMessages() const {
+      static const std::map<uint32_t, Vector::DBC::Message> empty;
+      return loaded_ ? net_->messages : empty;
   }
 
 private:
