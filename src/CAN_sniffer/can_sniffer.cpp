@@ -3,6 +3,8 @@
 #include "app_main.hpp"
 #include "imgui.h"
 #include "implot.h"
+#include <algorithm>
+#include <cstdint>
 #include <cstdio>
 #include <deque>
 #include <ostream>
@@ -152,32 +154,38 @@ static void RenderSignalBarPlot(const char *plotTitle,
 }
 
 void Bar_plot() {
-  // Partition signals into multiplexed messages and non-multiplexed
-  std::vector<std::pair<uint32_t, const CANDBC_PARSER::MessageData *>> multiplexed_msgs;
+  // Partition signals by their individual multiplexed flag, not the message-level flag.
+  // This ensures non-multiplexed signals inside mixed messages still appear correctly.
+  struct MuxMsgSignals {
+    const CANDBC_PARSER::MessageData *msg;
+    std::vector<std::pair<uint32_t, const CANDBC_PARSER::SignalValue *>> sigs;
+  };
+  std::map<uint32_t, MuxMsgSignals> multiplexed_msgs;
   std::vector<std::pair<uint32_t, const CANDBC_PARSER::SignalValue *>> non_mux_signals;
 
   for (const auto &entry : CANDBC_PARSER::signal_store) {
     const auto &msgData = entry.second;
-    if (msgData.hasMultiplexedSignals) {
-      multiplexed_msgs.push_back({entry.first, &msgData});
-    } else {
-      for (const auto &sig : msgData.signals) {
+    for (const auto &sig : msgData.signals) {
+      if (sig.second.isMultiplexed) {
+        auto &mux = multiplexed_msgs[msgData.id];
+        mux.msg = &msgData;
+        mux.sigs.push_back({msgData.id, &sig.second});
+      } else {
         non_mux_signals.push_back({msgData.id, &sig.second});
       }
     }
   }
 
-  // Render individual plots for each multiplexed message
-  for (const auto &muxMsg : multiplexed_msgs) {
+  // Render individual plots for each multiplexed message (sorted by signal name)
+  for (auto &[id, muxMsg] : multiplexed_msgs) {
+    std::sort(muxMsg.sigs.begin(), muxMsg.sigs.end(),
+              [](const auto &a, const auto &b) {
+                return a.second->name < b.second->name;
+              });
     char title[128];
-    snprintf(title, sizeof(title), "%s (0x%X)", muxMsg.second->name.c_str(),
-             muxMsg.second->id);
-
-    std::vector<std::pair<uint32_t, const CANDBC_PARSER::SignalValue *>> sigs;
-    for (const auto &sig : muxMsg.second->signals) {
-      sigs.push_back({muxMsg.second->id, &sig.second});
-    }
-    RenderSignalBarPlot(title, sigs);
+    snprintf(title, sizeof(title), "%s (0x%X)", muxMsg.msg->name.c_str(),
+             muxMsg.msg->id);
+    RenderSignalBarPlot(title, muxMsg.sigs);
   }
 
   // Render one combined plot for all non-multiplexed signals
@@ -265,65 +273,203 @@ namespace CAN_IG {
 /*
  * --------------------------------------------------------
  * Purpose: For each message in DBC File, create a table and allow selection of
- * the specific signal value Input: NONE Output: NONE
+ * the specific signal value. Iterates the DBC messages directly so all signals
+ * are shown even without live CAN traffic.
  * --------------------------------------------------------
  */
 void CAN_IG::CAN_IG::gen_tables() {
-  static bool selected[10] = {};
-
-  if (ImGui::BeginTable("split1", 3,
-                        ImGuiTableFlags_Resizable |
-                            ImGuiTableFlags_NoSavedSettings |
-                            ImGuiTableFlags_Borders)) {
-    for (int i = 0; i < 10; i++) {
-      char label[32];
-      sprintf(label, "Item %d", i);
-      ImGui::TableNextColumn();
-      ImGui::Selectable(label,
-                        &selected[i]); // FIXME-TABLE: Selection overlap
-    }
-    ImGui::EndTable();
+  const auto *messages = CAN_MODE_WINDOW::parser.getMessages();
+  if (!messages || messages->empty()) {
+    ImGui::TextDisabled("No DBC messages loaded...");
+    return;
   }
-  ImGui::Spacing();
-  if (ImGui::BeginTable("split2", 3,
-                        ImGuiTableFlags_Resizable |
-                            ImGuiTableFlags_NoSavedSettings |
-                            ImGuiTableFlags_Borders)) {
-    for (int i = 0; i < 10; i++) {
-      char label[32];
-      sprintf(label, "Item %d", i);
-      ImGui::TableNextRow();
-      ImGui::TableNextColumn();
-      ImGui::Selectable(label, &selected[i],
-                        ImGuiSelectableFlags_SpanAllColumns);
-      ImGui::TableNextColumn();
-      ImGui::Text("Some other contents");
-      ImGui::TableNextColumn();
-      ImGui::Text("123456");
-    }
-    ImGui::EndTable();
-  }
-};
 
-/*
- * --------------------------------------------------------
- * Purpose: Defines Context in case context is not created
- * value Input: NONE
- * Output: NONE
- * --------------------------------------------------------
- */
+  // Show selected signal info at the top
+  if (hasSelection) {
+    ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f),
+                       "Selected: %s  (Msg 0x%X)",
+                       selectedSignalName.c_str(), selectedMsgId);
+    ImGui::Separator();
+  }
+
+  for (const auto &[msgId, msg] : *messages) {
+    // Tree node per message: "MessageName (0xID) - N signals"
+    char header[128];
+    snprintf(header, sizeof(header), "%s (0x%X) - %zu signals",
+             msg.name.c_str(), msg.id,
+             msg.signals.size());
+
+    ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_DefaultOpen;
+    if (!ImGui::TreeNodeEx(header, nodeFlags))
+      continue;
+
+    // Use a unique table ID per message to avoid ImGui ID collisions
+    char tableId[64];
+    snprintf(tableId, sizeof(tableId), "##signals_%X", msg.id);
+
+    if (ImGui::BeginTable(tableId, 6,
+                          ImGuiTableFlags_Resizable |
+                              ImGuiTableFlags_RowBg |
+                              ImGuiTableFlags_Borders |
+                              ImGuiTableFlags_SizingStretchProp)) {
+      ImGui::TableSetupColumn("Signal",  ImGuiTableColumnFlags_None, 3.0f);
+      ImGui::TableSetupColumn("Unit",    ImGuiTableColumnFlags_None, 1.0f);
+      ImGui::TableSetupColumn("Min",     ImGuiTableColumnFlags_None, 1.0f);
+      ImGui::TableSetupColumn("Max",     ImGuiTableColumnFlags_None, 1.0f);
+      ImGui::TableSetupColumn("Factor",  ImGuiTableColumnFlags_None, 1.0f);
+      ImGui::TableSetupColumn("Offset",  ImGuiTableColumnFlags_None, 1.0f);
+      ImGui::TableHeadersRow();
+
+      // Collect signals and sort with natural numeric ordering
+      std::vector<std::pair<std::string, const Vector::DBC::Signal *>> sortedSigs;
+      for (const auto &[sName, s] : msg.signals)
+        sortedSigs.push_back({sName, &s});
+      std::sort(sortedSigs.begin(), sortedSigs.end(),
+                [](const auto &a, const auto &b) {
+                  const auto &sa = a.first;
+                  const auto &sb = b.first;
+                  size_t ia = 0, ib = 0;
+                  while (ia < sa.size() && ib < sb.size()) {
+                    if (std::isdigit(sa[ia]) && std::isdigit(sb[ib])) {
+                      // Compare numeric segments by value
+                      size_t na = ia, nb = ib;
+                      while (na < sa.size() && std::isdigit(sa[na])) na++;
+                      while (nb < sb.size() && std::isdigit(sb[nb])) nb++;
+                      unsigned long va = std::stoul(sa.substr(ia, na - ia));
+                      unsigned long vb = std::stoul(sb.substr(ib, nb - ib));
+                      if (va != vb) return va < vb;
+                      ia = na; ib = nb;
+                    } else {
+                      if (sa[ia] != sb[ib]) return sa[ia] < sb[ib];
+                      ia++; ib++;
+                    }
+                  }
+                  return sa.size() < sb.size();
+                });
+
+      for (const auto &[sigName, sigPtr] : sortedSigs) {
+        const auto &sig = *sigPtr;
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+
+        bool isSelected = hasSelection && selectedMsgId == msgId &&
+                          selectedSignalName == sigName;
+
+        if (ImGui::Selectable(sig.name.c_str(), isSelected,
+                              ImGuiSelectableFlags_SpanAllColumns)) {
+          hasSelection = true;
+          selectedMsgId = msgId;
+          selectedSignalName = sigName;
+          // Reset input value to signal minimum when selecting a new signal
+          inputValue = sig.minimum;
+        }
+
+        ImGui::TableNextColumn();
+        ImGui::Text("%s", sig.unit.c_str());
+        ImGui::TableNextColumn();
+        ImGui::Text("%.2f", sig.minimum);
+        ImGui::TableNextColumn();
+        ImGui::Text("%.2f", sig.maximum);
+        ImGui::TableNextColumn();
+        ImGui::Text("%.4g", sig.factor);
+        ImGui::TableNextColumn();
+        ImGui::Text("%.4g", sig.offset);
+      }
+      ImGui::EndTable();
+    }
+    ImGui::TreePop();
+  }
+}
+
 CAN_IG::CAN_IG() {}
 
 void CAN_IG::CAN_IG::RenderUI() {
-  if (CAN_MODE_WINDOW::parser.is_loaded()) {
-    ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
-    ImGui::Begin("CAN IG Tables");
-    ImGui::BeginChild("TablesScroll", ImVec2(0, 0), ImGuiChildFlags_None,
-                      ImGuiWindowFlags_AlwaysVerticalScrollbar);
-    this->gen_tables();
-    ImGui::EndChild();
-    ImGui::End();
+  if (!CAN_MODE_WINDOW::parser.is_loaded())
+    return;
+
+  ImGui::SetNextWindowSize(ImVec2(600, 500), ImGuiCond_FirstUseEver);
+  ImGui::Begin("CAN IG Tables");
+
+  // --- Signal tables (scrollable region) ---
+  float sendPanelHeight = hasSelection ? 120.0f : 0.0f;
+  ImGui::BeginChild("TablesScroll", ImVec2(0, -sendPanelHeight),
+                    ImGuiChildFlags_None,
+                    ImGuiWindowFlags_AlwaysVerticalScrollbar);
+  this->gen_tables();
+  ImGui::EndChild();
+
+  // --- Send panel (only when a signal is selected) ---
+  if (hasSelection) {
+    ImGui::Separator();
+
+    const auto *messages = CAN_MODE_WINDOW::parser.getMessages();
+    const Vector::DBC::Signal *selSignal = nullptr;
+    const Vector::DBC::Message *selMsg = nullptr;
+
+    if (messages) {
+      auto msgIt = messages->find(selectedMsgId);
+      if (msgIt != messages->end()) {
+        selMsg = &msgIt->second;
+        auto sigIt = msgIt->second.signals.find(selectedSignalName);
+        if (sigIt != msgIt->second.signals.end()) {
+          selSignal = &sigIt->second;
+        }
+      }
+    }
+
+    if (selSignal && selMsg) {
+      ImGui::Text("Signal: %s  |  Message: %s (0x%X)  |  Range: [%.2f .. %.2f] %s",
+                  selSignal->name.c_str(), selMsg->name.c_str(), selMsg->id,
+                  selSignal->minimum, selSignal->maximum,
+                  selSignal->unit.c_str());
+
+      ImGui::SetNextItemWidth(200.0f);
+      ImGui::InputDouble("Physical Value", &inputValue, 0.1, 1.0, "%.4f");
+
+      // Clamp to signal min/max (unless DBC has 0/0 which means unconstrained)
+      if (selSignal->minimum != 0.0 || selSignal->maximum != 0.0) {
+        if (inputValue < selSignal->minimum) inputValue = selSignal->minimum;
+        if (inputValue > selSignal->maximum) inputValue = selSignal->maximum;
+      }
+
+      ImGui::SameLine();
+      if (ImGui::Button("Send")) {
+        // 1. Convert physical value to raw
+        double rawValue = selSignal->physicalToRawValue(inputValue);
+
+        // 2. Create zero-initialized CAN data buffer
+        std::vector<uint8_t> buffer(selMsg->size, 0);
+
+        // 3. Encode raw value into the buffer at the signal's bit position
+        // encode() expects uint64_t
+        uint64_t rawU64 = static_cast<uint64_t>(static_cast<int64_t>(rawValue));
+        const_cast<Vector::DBC::Signal*>(selSignal)->encode(buffer, rawU64);
+
+        // 4. Convert buffer to hex string
+        std::string hexData;
+        hexData.reserve(buffer.size() * 2);
+        for (uint8_t byte : buffer) {
+          char hex[3];
+          snprintf(hex, sizeof(hex), "%02X", byte);
+          hexData += hex;
+        }
+
+        // 5. Build JSON and send
+        nlohmann::json j;
+        j["id"] = selMsg->id;
+        j["data"] = hexData;
+        std::string jsonStr = j.dump() + "\n";
+        MyApp::serialReader.Send(jsonStr);
+      }
+    } else {
+      ImGui::TextDisabled("Selected signal no longer found in DBC.");
+      if (ImGui::Button("Clear Selection")) {
+        hasSelection = false;
+      }
+    }
   }
+
+  ImGui::End();
 }
 
 } // namespace CAN_IG

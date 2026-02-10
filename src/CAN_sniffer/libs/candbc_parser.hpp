@@ -53,6 +53,9 @@ public:
   bool is_loaded() const { return loaded_; }
   std::optional<can_frame_t> parse_frame(std::string data);
   nlohmann::json parse_json(std::string data);
+  const std::map<uint32_t, Vector::DBC::Message>* getMessages() const {
+      return loaded_ ? &net_->messages : nullptr;
+  }
 
 private:
   std::vector<uint8_t> HexStringtoBytes(std::string hex);

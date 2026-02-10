@@ -148,6 +148,26 @@ void SerialReader::Run(std::string portname, unsigned int baudrate) {
 }
 
 /*
+ * Purpose: Send data over the serial port from the UI thread
+ * Posts an async_write to the worker thread's io_context
+ */
+void SerialReader::Send(const std::string &data) {
+  std::lock_guard<std::mutex> lk(serial_mtx_);
+  if (!active_io_ || !active_serial_ || !running_.load(std::memory_order_acquire))
+    return;
+
+  auto buf = std::make_shared<std::string>(data);
+  boost::asio::post(*active_io_, [this, buf]() {
+    boost::system::error_code ec;
+    boost::asio::write(*active_serial_, boost::asio::buffer(*buf), ec);
+    if (ec) {
+      std::lock_guard<std::mutex> lk(error_mtx_);
+      last_error_ = "write: " + ec.message();
+    }
+  });
+}
+
+/*
  * Purpose: Stop the serial reader
  */
 void SerialReader::Stop() {
