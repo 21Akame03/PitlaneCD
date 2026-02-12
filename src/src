@@ -1,0 +1,122 @@
+#include "candbc_parser.hpp"
+#include "app_main.hpp"
+
+#include "nlohmann/json.hpp"
+#include <algorithm>
+#include <array>
+#include <fstream>
+#include <optional>
+#include <stdexcept>
+#include <unordered_map>
+
+#include <Vector/DBC.h>
+
+namespace CANDBC_PARSER {
+
+// Constructor
+DBCParser::DBCParser() {};
+
+/*
+ * Purpose: Get the network from the DBC file and check if it is presents
+ * Input: DBC filepath
+ * Output: true if successful
+ */
+bool DBCParser::load_dbc(const std::string &filepath) {
+  // Skip if already loaded with the same file
+  if (loaded_ && dbcfilepath_ == filepath) {
+    return true;
+  }
+
+  this->dbcfilepath_ = filepath;
+
+  std::ifstream idbc(this->dbcfilepath_);
+  auto net = std::make_unique<Vector::DBC::Network>();
+  if (!idbc.is_open()) {
+    std::cerr << "failed to open dbc file" << std::endl;
+    loaded_ = false;
+    return false;
+  }
+
+  idbc >> *net;
+
+  if (!net->successfullyParsed) {
+    std::cerr << "failed to parse dbc" << std::endl;
+    loaded_ = false;
+    return false;
+  }
+
+  this->net_ = std::move(net);
+  loaded_ = true;
+
+  return true;
+}
+
+/*
+ * Purpose: Parse the JSON frame and return the result
+ * Input: NONE
+ * Output: JSON frame
+ */
+nlohmann::json DBCParser::parse_json() {
+  boost::system::error_code ec;
+
+  // pull frame string from the queue
+  std::deque<std::string> frame = MyApp::serialReader.PollRxBuffer();
+
+  // parse the json received
+  nlohmann::json value = nlohmann::json::parse(frame.front());
+
+  if (ec) {
+    std::cerr << "Exception: " << ec.message() << std::endl;
+    return false;
+  }
+
+  return value;
+}
+
+/* loop over messages */
+for (const auto &message : network.messages) {
+  std::cout << "Message " << message.second.name << std::endl;
+
+  /* loop over signals of this messages */
+  for (const auto &signal : message.second.signals)
+    std::cout << "  Signal " << signal.second.name << std::endl;
+}
+
+/*
+ * Purpose: Check if the message id is present in the DBC file
+ *
+ */
+std::optional<Vector::DBC::Message>
+DBCParser::is_messagevalid(Vector::DBC::Network net, uint32_t id) {
+  // find the message with the id in the network
+  for (const auto &message : net.messages) {
+    if (message.second.id == id) {
+      return message.second;
+    }
+  }
+
+  return std::nullopt;
+}
+
+/*
+ * Purpose: Parse the CAN frame and return the result
+ *
+ */
+bool DBCParser::parse_frame() {
+
+  // start finding out the value from the dbc file
+  // lets start parsing
+  nlohmann::json json_fram = parse_json();
+
+  // now we need the id to identify the message
+  uint32_t id = json_fram["id"];
+
+  // we check if there is a message with the id in the dbc file
+
+  auto message = is_messagevalid(this->net_, id);
+  if (message) {
+  }
+  return true;
+}
+
+} // namespace CANDBC_PARSER

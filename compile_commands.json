@@ -1,0 +1,212 @@
+[
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/main.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/main.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/main.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/main.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/src/CAN_sniffer/can_sniffer.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/CAN_sniffer/can_sniffer.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/CAN_sniffer/can_sniffer.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/src/CAN_sniffer/can_sniffer.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/src/CAN_sniffer/libs/candbc_parser.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/CAN_sniffer/libs/candbc_parser.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/CAN_sniffer/libs/candbc_parser.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/src/CAN_sniffer/libs/candbc_parser.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/src/Serial_reader/serial_inputs.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/Serial_reader/serial_inputs.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/Serial_reader/serial_inputs.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/src/Serial_reader/serial_inputs.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/src/Serial_reader/serial_port_discovery.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/Serial_reader/serial_port_discovery.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/Serial_reader/serial_port_discovery.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/src/Serial_reader/serial_port_discovery.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/src/app_main.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/app_main.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/app_main.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/src/app_main.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/src/backend/serial_worker.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/backend/serial_worker.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/backend/serial_worker.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/src/backend/serial_worker.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/src/plotter/plotter.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/plotter/plotter.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/plotter/plotter.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/src/plotter/plotter.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/src/settings/settings.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/settings/settings.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src/settings/settings.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/src/settings/settings.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/imgui.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/imgui.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/imgui.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/imgui.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/imgui_demo.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/imgui_demo.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/imgui_demo.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/imgui_demo.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/imgui_draw.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/imgui_draw.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/imgui_draw.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/imgui_draw.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/imgui_tables.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/imgui_tables.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/imgui_tables.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/imgui_tables.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/imgui_widgets.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/imgui_widgets.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/imgui_widgets.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/imgui_widgets.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/backends/imgui_impl_glfw.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends/imgui_impl_glfw.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends/imgui_impl_glfw.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/backends/imgui_impl_glfw.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/backends/imgui_impl_opengl3.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends/imgui_impl_opengl3.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends/imgui_impl_opengl3.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/_deps/imgui-src/backends/imgui_impl_opengl3.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/_deps/implot-src/implot.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src/implot.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src/implot.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/_deps/implot-src/implot.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/_deps/implot-src/implot_demo.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src/implot_demo.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src/implot_demo.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/_deps/implot-src/implot_demo.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/_deps/implot-src/implot_items.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src/implot_items.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src/implot_items.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/_deps/implot-src/implot_items.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src/backends -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/implot-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/nl_json-src/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include -std=gnu++17 -arch arm64 -o CMakeFiles/glfw_opengl3.dir/_deps/imguifiledialog-src/ImGuiFileDialog.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src/ImGuiFileDialog.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src/ImGuiFileDialog.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/CMakeFiles/glfw_opengl3.dir/_deps/imguifiledialog-src/ImGuiFileDialog.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imgui-src  -arch arm64 -Wno-unknown-pragmas -o _deps/imguifiledialog-build/CMakeFiles/ImGuiFileDialog.dir/ImGuiFileDialog.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src/ImGuiFileDialog.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-src/ImGuiFileDialog.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/imguifiledialog-build/CMakeFiles/ImGuiFileDialog.dir/ImGuiFileDialog.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/AttributeDefinition.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/AttributeDefinition.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/AttributeDefinition.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/AttributeDefinition.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/AttributeRelation.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/AttributeRelation.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/AttributeRelation.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/AttributeRelation.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/AttributeValueType.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/AttributeValueType.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/AttributeValueType.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/AttributeValueType.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/BitTiming.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/BitTiming.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/BitTiming.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/BitTiming.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/EnvironmentVariable.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/EnvironmentVariable.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/EnvironmentVariable.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/EnvironmentVariable.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/Message.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/Message.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/Message.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/Message.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/Network.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/Network.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/Network.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/Network.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/platform.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/platform.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/platform.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/platform.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/Signal.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/Signal.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/Signal.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/Signal.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/SignalGroup.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/SignalGroup.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/SignalGroup.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/SignalGroup.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/SignalType.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/SignalType.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/SignalType.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/SignalType.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/ValueTable.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/ValueTable.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src/Vector/DBC/ValueTable.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/ValueTable.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/Scanner.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/Scanner.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/Scanner.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/Scanner.cpp.o"
+},
+{
+  "directory": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build",
+  "command": "/usr/bin/c++ -DVector_DBC_EXPORTS -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-src/src -I/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src -O3 -DNDEBUG -std=c++14 -arch arm64 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -o _deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/Parser.cpp.o -c /Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/Parser.cpp",
+  "file": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/Parser.cpp",
+  "output": "/Users/akame/Documents/E-traxx/Pitlane_ControlDesk/build/_deps/vector_dbc-build/src/Vector/DBC/CMakeFiles/Vector_DBC.dir/Parser.cpp.o"
+}
+]
