@@ -1,5 +1,4 @@
 # Pitlane_ControlDesk
-[![Build](https://github.com/21Akame03/Pitlane_ControlDesk/actions/workflows/build.yml/badge.svg)](https://github.com/21Akame03/Pitlane_ControlDesk/actions/workflows/build.yml)
 
 ControlDesk-like development UI for **pitlane_rs**.
 
