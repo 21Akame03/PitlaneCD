@@ -39,12 +39,11 @@ void createCheckboxes(std::vector<VariableCheckbox> &variables) {
  * the string itself
  * Output: operation status
  */
-bool comport_combo_getter(void *data, int idx, const char **out_text) {
+const char *comport_combo_getter(void *data, int idx) {
   auto &v = *static_cast<std::vector<std::string> *>(data);
   if (idx < 0 || idx >= (int)v.size())
-    return false;
-  *out_text = v[idx].c_str();
-  return true;
+    return nullptr;
+  return v[idx].c_str();
 }
 
 /*

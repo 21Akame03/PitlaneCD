@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <boost/asio.hpp>
+#include <deque>
 #include <vector>
 
 namespace SERIAL {

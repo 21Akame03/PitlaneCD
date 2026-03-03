@@ -36,6 +36,7 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG v3.12.0
 )
+set(OPTION_RUN_DOXYGEN OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(imgui implot ImGuiFileDialog vector_dbc nl_json)
 
 # Ensure vector_dbc finds its own headers when used as a subproject
