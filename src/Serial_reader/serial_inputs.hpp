@@ -2,6 +2,10 @@
 #define SERIAL_INPUTS_HPP
 
 #include <atomic>
+#include <deque>
+#include <mutex>
+#include <string>
+#include <thread>
 #include <boost/asio.hpp>
 #include <vector>
 

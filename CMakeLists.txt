@@ -163,5 +163,7 @@ elseif(WIN32)
     opengl32
     gdi32
     shell32
+    ws2_32
+    wsock32
   )
 endif()

@@ -218,9 +218,10 @@ __marimo__/
 build/
 cmake-build-*/
 _build/
-
+build_win64/
 # Compiled binaries (add specific names as needed)
 glfw_opengl3/example_glfw_opengl3
+
 
 # IDE
 .vscode/
