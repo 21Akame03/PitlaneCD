@@ -36,18 +36,28 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG v3.12.0
 )
-# On macOS, Homebrew flex headers may not be on the default search path.
-# Apple's system flex generates size_t signatures; prefer the Homebrew flex
-# binary + headers so the generated scanner matches FlexLexer.h.
-if(APPLE)
+FetchContent_Declare(
+  boost
+  URL https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-cmake.tar.gz
+  EXCLUDE_FROM_ALL
+)
+# On macOS (native or cross-compiling from macOS), Homebrew flex headers may
+# not be on the default search path.  Flex/bison are host tools needed at
+# build time, so we must locate them even when CMAKE_SYSTEM_NAME != Darwin.
+if(APPLE OR CMAKE_CROSSCOMPILING)
+  # Flex/bison are host tools — bypass cross-compilation sysroot restrictions
   find_program(FLEX_EXECUTABLE flex
     HINTS /opt/homebrew/opt/flex/bin /usr/local/opt/flex/bin
     NO_DEFAULT_PATH
+    NO_CMAKE_FIND_ROOT_PATH
   )
   find_path(FLEX_INCLUDE_DIR FlexLexer.h
     HINTS /opt/homebrew/opt/flex/include /usr/local/opt/flex/include
     NO_DEFAULT_PATH
+    NO_CMAKE_FIND_ROOT_PATH
   )
+  # Propagate into cache so vector_dbc's find_package(FLEX) picks it up
+  set(FLEX_INCLUDE_DIRS "${FLEX_INCLUDE_DIR}" CACHE PATH "" FORCE)
 endif()
 
 # Disable vector_dbc extras we don't need
@@ -56,9 +66,20 @@ set(OPTION_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(OPTION_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 # Build Vector_DBC as a static library so we don't need to ship the DLL
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+# The upstream CMakeLists.txt hardcodes SHARED, so we must patch it before building.
+FetchContent_GetProperties(vector_dbc)
+if(NOT vector_dbc_POPULATED)
+  FetchContent_Populate(vector_dbc)
+  # Patch: replace hardcoded SHARED with STATIC so no DLL is produced
+  file(READ "${vector_dbc_SOURCE_DIR}/src/Vector/DBC/CMakeLists.txt" _vdbc_cmake)
+  string(REPLACE "add_library(\${PROJECT_NAME} SHARED \"\")" "add_library(\${PROJECT_NAME} STATIC \"\")" _vdbc_cmake "${_vdbc_cmake}")
+  file(WRITE "${vector_dbc_SOURCE_DIR}/src/Vector/DBC/CMakeLists.txt" "${_vdbc_cmake}")
+  add_subdirectory(${vector_dbc_SOURCE_DIR} ${vector_dbc_BINARY_DIR})
+endif()
 
-FetchContent_MakeAvailable(imgui implot ImGuiFileDialog vector_dbc nl_json)
+# Only fetch the Boost libraries we actually need
+set(BOOST_INCLUDE_LIBRARIES asio system CACHE STRING "" FORCE)
+FetchContent_MakeAvailable(imgui implot ImGuiFileDialog nl_json boost)
 
 # Ensure vector_dbc finds its own headers when used as a subproject
 if(TARGET Vector_DBC)
@@ -124,8 +145,11 @@ target_compile_features(glfw_opengl3 PRIVATE cxx_std_17)
 
 find_package(OpenGL REQUIRED)
 
-# Try system GLFW first, fetch from source if not found
-find_package(glfw3 3.3 QUIET)
+# Try system GLFW first, fetch from source if not found.
+# When cross-compiling, always fetch from source to avoid picking up host libraries.
+if(NOT CMAKE_CROSSCOMPILING)
+  find_package(glfw3 3.3 QUIET)
+endif()
 if(NOT glfw3_FOUND)
   message(STATUS "System glfw3 not found — fetching via FetchContent")
   set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -153,6 +177,7 @@ target_link_libraries(glfw_opengl3 PRIVATE
   ${GLFW_TARGET}
   Vector_DBC
   nlohmann_json::nlohmann_json
+  Boost::asio
 )
 
 if(APPLE)
