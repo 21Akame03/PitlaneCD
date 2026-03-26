@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "imgui_internal.h" // Required for DockBuilder API
 #include "implot.h"
+#include "debug_log/debug_view.hpp"
 #include "plotter/plotter.hpp"
 #include "settings/settings.hpp"
 
@@ -19,6 +20,7 @@ static bool first_time_layout = true; // Track if we need to set up default layo
 std::vector<SETTINGS::VariableCheckbox> variables;
 CAN_MODE_WINDOW::Sniffer_window sniffer = CAN_MODE_WINDOW::Sniffer_window();
 CAN_IG::CAN_IG IG = CAN_IG::CAN_IG();
+DEBUG_LOG::DebugView debugView;
 
 // Serial Reader obj
 SERIAL::SerialReader serialReader = SERIAL::SerialReader();
@@ -241,7 +243,7 @@ void RenderUI() {
 
   // Debug Mode
   case Mode_t::DEBUG:
-
+    debugView.RenderUI();
     break;
 
   // renders the CAN_SNIFFER VIEW

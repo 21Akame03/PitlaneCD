@@ -9,49 +9,77 @@ Compatible with **ESP32** and **STM32** (and generally anything that can stream 
 
 ---
 
+## Supported Platforms
+
+| OS | Architecture | Status |
+|----|-------------|--------|
+| macOS | ARM (Apple Silicon) | Supported |
+| macOS | x86_64 | Supported |
+| Linux | x86_64 | Supported |
+| Linux | ARM64 | Supported |
+| Windows | x86_64 | Supported |
+| Windows | ARM64 | Experimental (GLFW 3.4+) |
+
 ## Building
+
+All dependencies (GLFW, ImGui, ImPlot, ImGuiFileDialog, Vector DBC, nlohmann/json) are fetched automatically via CMake FetchContent. GLFW will use a system install if available, otherwise it is built from source.
 
 ### Prerequisites
 
 - CMake 3.15+
-- Ninja build system
 - C++17 compatible compiler
-- GLFW3 (`brew install glfw` on macOS)
-- Flex and Bison (`brew install flex bison` on macOS)
+- OpenGL development libraries
+- Flex and Bison
 
 ### macOS
 
 ```bash
+# Install build tools
+brew install cmake flex bison
+
 # Configure and build
-cmake -B build -G Ninja -DFLEX_INCLUDE_DIR=/Library/Developer/CommandLineTools/usr/include -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake -B build
 cmake --build build
 
 # Run
 ./build/glfw_opengl3
 ```
 
-> **Note:** The `FLEX_INCLUDE_DIR` flag is required because CMake's FindFLEX module on macOS finds the flex executable but not the `FlexLexer.h` header. This header is typically located at `/Library/Developer/CommandLineTools/usr/include`. If you installed flex via Homebrew, the path might be `/opt/homebrew/Cellar/flex/<version>/include` instead.
+> **Note:** GLFW is fetched automatically if not installed. To use a system install: `brew install glfw`
 
 ### Linux
 
 ```bash
 # Install dependencies (Ubuntu/Debian)
-sudo apt install cmake ninja-build libglfw3-dev flex bison
+sudo apt install cmake build-essential libgl-dev flex bison
 
 # Configure and build
-cmake -B build -G Ninja
+cmake -B build
 cmake --build build
 
 # Run
 ./build/glfw_opengl3
 ```
 
+> **Note:** On Linux, GLFW is fetched from source if `libglfw3-dev` is not installed. Installing it via your package manager (`sudo apt install libglfw3-dev`) avoids the extra build time.
+
 ### Windows
 
-Use the provided `build_win32.bat` script or configure with CMake:
+```bash
+# Using Visual Studio Developer Command Prompt or MSYS2
+cmake -B build
+cmake --build build
+
+# Run
+.\build\Release\glfw_opengl3.exe
+```
+
+> **Note:** GLFW and all other dependencies are fetched and built automatically. No manual dependency installation is required.
+
+### Cross-compiling (macOS Universal Binary)
 
 ```bash
-cmake -B build -G Ninja
+cmake -B build -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
 cmake --build build
 ```
 

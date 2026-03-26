@@ -36,6 +36,25 @@ FetchContent_Declare (
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG v3.12.0
 )
+# On macOS, Homebrew flex headers may not be on the default search path.
+# Apple's system flex generates size_t signatures; prefer the Homebrew flex
+# binary + headers so the generated scanner matches FlexLexer.h.
+if(APPLE)
+  find_program(FLEX_EXECUTABLE flex
+    HINTS /opt/homebrew/opt/flex/bin /usr/local/opt/flex/bin
+    NO_DEFAULT_PATH
+  )
+  find_path(FLEX_INCLUDE_DIR FlexLexer.h
+    HINTS /opt/homebrew/opt/flex/include /usr/local/opt/flex/include
+    NO_DEFAULT_PATH
+  )
+endif()
+
+# Disable vector_dbc extras we don't need
+set(OPTION_RUN_DOXYGEN OFF CACHE BOOL "" FORCE)
+set(OPTION_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(OPTION_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+
 FetchContent_MakeAvailable(imgui implot ImGuiFileDialog vector_dbc nl_json)
 
 # Ensure vector_dbc finds its own headers when used as a subproject
@@ -101,7 +120,22 @@ target_include_directories(glfw_opengl3 PRIVATE
 target_compile_features(glfw_opengl3 PRIVATE cxx_std_17)
 
 find_package(OpenGL REQUIRED)
-find_package(glfw3 3.3 REQUIRED)
+
+# Try system GLFW first, fetch from source if not found
+find_package(glfw3 3.3 QUIET)
+if(NOT glfw3_FOUND)
+  message(STATUS "System glfw3 not found — fetching via FetchContent")
+  set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+  set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+  set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+  set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+  FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG 3.4
+  )
+  FetchContent_MakeAvailable(glfw)
+endif()
 
 if(TARGET glfw)
   set(GLFW_TARGET glfw)
@@ -123,5 +157,11 @@ if(APPLE)
     "-framework Cocoa"
     "-framework IOKit"
     "-framework CoreVideo"
+  )
+elseif(WIN32)
+  target_link_libraries(glfw_opengl3 PRIVATE
+    opengl32
+    gdi32
+    shell32
   )
 endif()
