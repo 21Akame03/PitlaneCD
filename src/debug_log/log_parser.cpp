@@ -14,13 +14,13 @@ namespace DEBUG_LOG {
 LogLevel CharToLevel(char c) {
   switch (c) {
   case 'D':
-    return LogLevel::DEBUG;
+    return LogLevel::DBG;
   case 'I':
     return LogLevel::INFO;
   case 'W':
     return LogLevel::WARN;
   case 'E':
-    return LogLevel::ERROR;
+    return LogLevel::ERR;
   default:
     return LogLevel::UNKNOWN;
   }
@@ -29,13 +29,13 @@ LogLevel CharToLevel(char c) {
 void LevelColor(LogLevel lvl, float &r, float &g, float &b, float &a) {
   a = 1.0f;
   switch (lvl) {
-  case LogLevel::DEBUG:
+  case LogLevel::DBG:
     r = 0.6f; g = 0.6f; b = 0.6f; break;
   case LogLevel::INFO:
     r = 0.4f; g = 0.8f; b = 1.0f; break;
   case LogLevel::WARN:
     r = 1.0f; g = 0.8f; b = 0.2f; break;
-  case LogLevel::ERROR:
+  case LogLevel::ERR:
     r = 1.0f; g = 0.3f; b = 0.3f; break;
   default:
     r = 1.0f; g = 1.0f; b = 1.0f; break;

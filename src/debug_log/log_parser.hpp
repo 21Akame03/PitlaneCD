@@ -8,11 +8,7 @@
 
 namespace DEBUG_LOG {
 
-// Windows <windows.h> defines ERROR as a macro; undefine it so the enum works.
-#ifdef ERROR
-#undef ERROR
-#endif
-enum class LogLevel { DEBUG, INFO, WARN, ERROR, UNKNOWN };
+enum class LogLevel { DBG, INFO, WARN, ERR, UNKNOWN };
 
 struct LogEntry {
   uint32_t timestamp_ms;

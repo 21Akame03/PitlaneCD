@@ -55,6 +55,9 @@ set(OPTION_RUN_DOXYGEN OFF CACHE BOOL "" FORCE)
 set(OPTION_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(OPTION_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
+# Build Vector_DBC as a static library so we don't need to ship the DLL
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
 FetchContent_MakeAvailable(imgui implot ImGuiFileDialog vector_dbc nl_json)
 
 # Ensure vector_dbc finds its own headers when used as a subproject
