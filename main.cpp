@@ -20,7 +20,7 @@
 #endif
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
-#include "app_main.hpp"
+#include "app.hpp"
 #include "implot.h"
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to
@@ -144,38 +144,6 @@ int main(int, char **) {
 #endif
   ImGui_ImplOpenGL3_Init(glsl_version);
 
-  // Load Fonts
-  // - If fonts are not explicitly loaded, Dear ImGui will call AddFontDefault()
-  // to select an embedded font: either AddFontDefaultVector() or
-  // AddFontDefaultBitmap().
-  //   This selection is based on (style.FontSizeBase * style.FontScaleMain *
-  //   style.FontScaleDpi) reaching a small threshold.
-  // - You can load multiple fonts and use ImGui::PushFont()/PopFont() to select
-  // them.
-  // - If a file cannot be loaded, AddFont functions will return a nullptr.
-  // Please handle those errors in your code (e.g. use an assertion, display an
-  // error and quit).
-  // - Read 'docs/FONTS.md' for more instructions and details.
-  // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use FreeType
-  // for higher quality font rendering.
-  // - Remember that in C/C++ if you want to include a backslash \ in a string
-  // literal you need to write a double backslash \\ !
-  // - Our Emscripten build process allows embedding fonts to be accessible at
-  // runtime from the "fonts/" folder. See Makefile.emscripten for details.
-  // style.FontSizeBase = 20.0f;
-  // io.Fonts->AddFontDefaultVector();
-  // io.Fonts->AddFontDefaultBitmap();
-  // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf");
-  // io.Fonts->AddFontFromFileTTF("../imgui/misc/fonts/DroidSans.ttf");
-  // io.Fonts->AddFontFromFileTTF("../imgui/misc/fonts/Roboto-Medium.ttf");
-  // io.Fonts->AddFontFromFileTTF("../imgui/misc/fonts/Cousine-Regular.ttf");
-  // ImFont* font =
-  // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf");
-  // IM_ASSERT(font != nullptr);
-
-  // Our state
-  bool show_demo_window = true;
-  bool show_another_window = false;
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   // Main loop
@@ -209,17 +177,8 @@ int main(int, char **) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    /* -----------------------------------------------------
-     *
-     * Main app backend
-     */
-
-    /* -----------------------------------------------------
-     *
-     * Main app UI
-     */
-
-    MyApp::RenderUI();
+    static App app;
+    app.RenderUI();
 
     // Rendering
     ImGui::Render();

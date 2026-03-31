@@ -1,15 +1,10 @@
-#include "log_parser.hpp"
+#include "debug/log_parser.hpp"
 
-#include <charconv>
+#include <cstdlib>
 #include <cstring>
 #include <sstream>
-#include <cstdlib>
 
-namespace DEBUG_LOG {
-
-// ──────────────────────────────────────────────
-// Helpers
-// ──────────────────────────────────────────────
+namespace debug {
 
 LogLevel CharToLevel(char c) {
   switch (c) {
@@ -42,14 +37,7 @@ void LevelColor(LogLevel lvl, float &r, float &g, float &b, float &a) {
   }
 }
 
-// ──────────────────────────────────────────────
-// Line parser
-// Format: [timestamp] [DIWE] [tag] message | k=v k=v ...
-// ──────────────────────────────────────────────
-
 static bool TryParseDouble(const std::string &s, double &out) {
-  // std::from_chars for double is not available on all toolchains yet,
-  // fall back to strtod
   char *end = nullptr;
   out = std::strtod(s.c_str(), &end);
   return end != s.c_str() && *end == '\0';
@@ -73,48 +61,51 @@ static void ParseKVPairs(const std::string &kv_str,
 }
 
 bool ParseLine(const std::string &line, LogEntry &out) {
-  // Manual parsing — much faster than std::regex.
-  // Format: [timestamp] [DIWE] [tag] message | k=v k=v ...
-
   const char *p = line.c_str();
 
-  // Skip leading whitespace
-  while (*p == ' ' || *p == '\t') ++p;
-
-  // Expect '['
-  if (*p != '[') return false;
+  while (*p == ' ' || *p == '\t')
+    ++p;
+  if (*p != '[')
+    return false;
   ++p;
 
-  // Parse timestamp digits
   const char *ts_start = p;
-  while (*p >= '0' && *p <= '9') ++p;
-  if (p == ts_start || *p != ']') return false;
+  while (*p >= '0' && *p <= '9')
+    ++p;
+  if (p == ts_start || *p != ']')
+    return false;
   out.timestamp_ms = static_cast<uint32_t>(std::strtoul(ts_start, nullptr, 10));
-  ++p; // skip ']'
+  ++p;
 
-  // Skip whitespace, expect '[', level char, ']'
-  while (*p == ' ' || *p == '\t') ++p;
-  if (*p != '[') return false;
+  while (*p == ' ' || *p == '\t')
+    ++p;
+  if (*p != '[')
+    return false;
   ++p;
   char lvl = *p;
-  if (lvl != 'D' && lvl != 'I' && lvl != 'W' && lvl != 'E') return false;
+  if (lvl != 'D' && lvl != 'I' && lvl != 'W' && lvl != 'E')
+    return false;
   out.level = CharToLevel(lvl);
   ++p;
-  if (*p != ']') return false;
+  if (*p != ']')
+    return false;
   ++p;
 
-  // Skip whitespace, expect '[', tag word chars, ']'
-  while (*p == ' ' || *p == '\t') ++p;
-  if (*p != '[') return false;
+  while (*p == ' ' || *p == '\t')
+    ++p;
+  if (*p != '[')
+    return false;
   ++p;
   const char *tag_start = p;
-  while (*p && *p != ']') ++p;
-  if (*p != ']' || p == tag_start) return false;
+  while (*p && *p != ']')
+    ++p;
+  if (*p != ']' || p == tag_start)
+    return false;
   out.tag.assign(tag_start, p);
-  ++p; // skip ']'
+  ++p;
 
-  // Skip whitespace — rest is message [ | kv_pairs ]
-  while (*p == ' ' || *p == '\t') ++p;
+  while (*p == ' ' || *p == '\t')
+    ++p;
 
   std::string rest(p);
   auto pipe = rest.find('|');
@@ -130,10 +121,6 @@ bool ParseLine(const std::string &line, LogEntry &out) {
   return true;
 }
 
-// ──────────────────────────────────────────────
-// AppState
-// ──────────────────────────────────────────────
-
 void AppState::Clear() {
   entries.clear();
   series.clear();
@@ -144,7 +131,6 @@ void AppState::Feed(const std::string &raw_line) {
   if (!ParseLine(raw_line, entry))
     return;
 
-  // For every numeric value, append to the corresponding PlotSeries
   for (auto &[key, val] : entry.values) {
     std::string series_name = entry.tag + "." + key;
     auto &s = series[series_name];
@@ -156,4 +142,4 @@ void AppState::Feed(const std::string &raw_line) {
   entries.push_back(std::move(entry));
 }
 
-} // namespace DEBUG_LOG
+} // namespace debug
