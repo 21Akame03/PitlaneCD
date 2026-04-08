@@ -1,16 +1,19 @@
 #include "app.hpp"
 #include "imgui.h"
 #include "imgui_internal.h"
+#include "ui/settings_panel.hpp"
+
+// USER CODE BEGINS AT THE BOTTOM
+// DO NOT CHANGE ANYTHING WITH DOCKING
 
 App::App()
-    : sniffer(dbc_parser, log, serial_reader),
-      ig(dbc_parser, serial_reader),
-      debug(serial_reader),
-      settings(serial_reader, dbc_parser, mode) {
+    : sniffer(dbc_parser, log, serial_reader), ig(dbc_parser, serial_reader),
+      debug(serial_reader), settings(serial_reader, dbc_parser, mode) {
   dbc_parser.set_log_callback(
       [this](const std::string &msg) { log.AddLog("%s", msg.c_str()); });
 }
 
+// Only runs once — after that imgui.ini takes over
 void App::setup_default_docking_layout(unsigned int dockspace_id) {
   ImGuiID id = dockspace_id;
   ImGuiDockNode *node = ImGui::DockBuilderGetNode(id);
@@ -39,10 +42,13 @@ void App::setup_default_docking_layout(unsigned int dockspace_id) {
   ImGui::DockBuilderFinish(id);
 }
 
+// ----------------------------
+// USER CODE BEGINS HERE
+// ----------------------------
 void App::mode_selector() {
   if (ImGui::BeginPopupModal("mode?", NULL,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
-    ImGui::Text("This Program can be used in 2 Different Modes\n"
+    ImGui::Text("This Program can be used in 3 Different Modes\n"
                 "You need to choose one before you can proceed!");
     ImGui::Separator();
 
@@ -56,10 +62,19 @@ void App::mode_selector() {
       mode = ui::AppMode::CanSniffer;
       ImGui::CloseCurrentPopup();
     }
+    ImGui::SetItemDefaultFocus();
+    ImGui::SameLine();
+    if (ImGui::Button("Telemetry", ImVec2(120, 0))) {
+      mode = ui::AppMode::Telemetry;
+      ImGui::CloseCurrentPopup();
+    }
     ImGui::EndPopup();
   }
   ImGui::OpenPopup("mode?");
 }
+// ----------------------------
+// USER CODE ENDS HERE
+// ----------------------------
 
 void App::RenderUI() {
   // Fullscreen dockspace
@@ -90,6 +105,9 @@ void App::RenderUI() {
     }
   }
 
+  // ----------------------------
+  // USER CODE BEGINS HERE
+  // ----------------------------
   if (ImGui::BeginMenuBar()) {
     if (ImGui::BeginMenu("Options")) {
       ImGui::MenuItem("Fullscreen", NULL, nullptr);
@@ -111,6 +129,9 @@ void App::RenderUI() {
   case ui::AppMode::CanSniffer:
     sniffer.render_ui();
     ig.render_ui();
+    break;
+    case ui::AppMode::Telemetry:
+    debug.render_ui();
     break;
   case ui::AppMode::None:
   default:

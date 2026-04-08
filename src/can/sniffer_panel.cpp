@@ -94,6 +94,7 @@ void SnifferPanel::render_bar_plot() {
     }
   }
 
+  // Give each multiplexed message its own plot, sorted alphabetically
   for (auto &[id, muxMsg] : multiplexed_msgs) {
     std::sort(muxMsg.sigs.begin(), muxMsg.sigs.end(),
               [](const auto &a, const auto &b) {

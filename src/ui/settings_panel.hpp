@@ -6,7 +6,7 @@
 
 namespace ui {
 
-enum class AppMode { None, CanSniffer, Debug };
+enum class AppMode { None, CanSniffer, Debug, Telemetry };
 
 class SettingsPanel {
 public:

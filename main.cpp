@@ -1,3 +1,13 @@
+ //     ____  ____________    ___    _   ________
+ //    / __ \/  _/_  __/ /   /   |  / | / / ____/
+ //   / /_/ // /  / / / /   / /| | /  |/ / __/
+ //  / ____// /  / / / /___/ ___ |/ /|  / /___
+ // /_/   /___/ /_/ /_____/_/  |_/_/ |_/_____/
+ //
+ //
+ // DO NOT OVERWRITE THIS FILE!!
+ // THE APP.CPP (MAIN FOR US) IS FOUND UNDER SRC
+ //
 // Dear ImGui: standalone example application for GLFW + OpenGL 3, using
 // programmable pipeline (GLFW is a cross-platform general purpose library for
 // handling windows, inputs, OpenGL/Vulkan/Metal graphics context creation,

@@ -22,6 +22,7 @@ void DbcParser::log(const char *fmt, ...) {
   log_cb_(std::string(buf));
 }
 
+// Skip reload if the same file is already active
 bool DbcParser::request_load(const std::string &path) {
   if (path.empty())
     return false;
@@ -102,6 +103,7 @@ std::optional<CanFrame> DbcParser::parse_frame(const std::string &data) {
   msgData.name = message->name;
   msgData.id = id;
 
+  // First pass: extract the mux switch value so we know which multiplexed signals are active
   unsigned int multiplexerSwitchValue = 0;
   for (const auto &signal : message->signals) {
     if (signal.second.multiplexor ==
@@ -113,6 +115,7 @@ std::optional<CanFrame> DbcParser::parse_frame(const std::string &data) {
     }
   }
 
+  // Second pass: decode all signals and update the live signal store
   for (const auto &signal : message->signals) {
     switch (signal.second.multiplexor) {
     case Vector::DBC::Signal::Multiplexor::MultiplexorSwitch: {
@@ -147,6 +150,7 @@ std::optional<CanFrame> DbcParser::parse_frame(const std::string &data) {
     }
   }
 
+  // We populate signal_store_ as a side-effect; no single CanFrame return needed
   return std::nullopt;
 }
 

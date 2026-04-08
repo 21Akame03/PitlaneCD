@@ -20,6 +20,7 @@ static const char *comport_combo_getter(void *data, int idx) {
 }
 
 void SettingsPanel::connection_selector() {
+  // Re-scan ports when nothing is selected yet
   if (com_ports_[current_port_] == "Disconnected") {
     com_ports_ = serial::list_serial_ports();
   }

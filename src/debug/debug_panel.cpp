@@ -1,6 +1,5 @@
 #include "debug/debug_panel.hpp"
 #include "imgui.h"
-#include "implot.h"
 
 #include <algorithm>
 #include <cstring>
@@ -8,8 +7,7 @@
 namespace debug {
 
 DebugPanel::DebugPanel(serial::SerialReader &reader)
-    : reader_(reader), auto_scroll_(true), plot_follow_(true),
-      plot_fit_requested_(false), plot_history_secs_(10.0f) {
+    : reader_(reader), auto_scroll_(true) {
   std::memset(filter_buf_, 0, sizeof(filter_buf_));
 }
 
@@ -22,7 +20,12 @@ void DebugPanel::render_ui() {
   }
 
   render_log_window();
-  render_plot_window();
+
+  // Render all open plotters, remove closed ones
+  plotters_.erase(
+      std::remove_if(plotters_.begin(), plotters_.end(),
+                     [](ui::DataPlotter &p) { return !p.render_ui(); }),
+      plotters_.end());
 }
 
 void DebugPanel::render_log_window() {
@@ -35,6 +38,10 @@ void DebugPanel::render_log_window() {
   ImGui::SameLine();
   ImGui::SetNextItemWidth(200);
   ImGui::InputText("Filter", filter_buf_, sizeof(filter_buf_));
+  ImGui::SameLine();
+  if (ImGui::Button("+ New Plot")) {
+    plotters_.emplace_back(next_plot_id_++, state_.series);
+  }
   ImGui::Separator();
 
   ImGui::BeginChild("LogScroll", ImVec2(0, 0), ImGuiChildFlags_None,
@@ -67,67 +74,6 @@ void DebugPanel::render_log_window() {
     ImGui::SetScrollHereY(1.0f);
 
   ImGui::EndChild();
-  ImGui::End();
-}
-
-void DebugPanel::render_plot_window() {
-  ImGui::Begin("Plotter Window");
-
-  if (state_.series.empty()) {
-    ImGui::TextDisabled("No plottable data yet. Send lines with | key=value");
-    ImGui::End();
-    return;
-  }
-
-  if (ImGui::Button("Fit"))
-    plot_fit_requested_ = true;
-  ImGui::SameLine();
-  ImGui::Checkbox("Follow", &plot_follow_);
-  ImGui::SameLine();
-  ImGui::SetNextItemWidth(120);
-  ImGui::SliderFloat("History (s)", &plot_history_secs_, 1.0f, 120.0f,
-                     "%.0f s");
-
-  double latest_ms = 0.0;
-  for (auto &[name, s] : state_.series) {
-    if (!s.points.empty()) {
-      double t = static_cast<double>(s.points.back().first);
-      if (t > latest_ms)
-        latest_ms = t;
-    }
-  }
-
-  if (ImPlot::BeginPlot("Debug Plot", ImVec2(-1, -1))) {
-    ImPlot::SetupAxes("time (ms)", "value");
-
-    if (plot_fit_requested_) {
-      ImPlot::SetupAxes("time (ms)", "value", ImPlotAxisFlags_AutoFit,
-                        ImPlotAxisFlags_AutoFit);
-      plot_fit_requested_ = false;
-    } else if (plot_follow_ && latest_ms > 0.0) {
-      double window_ms = static_cast<double>(plot_history_secs_) * 1000.0;
-      ImPlot::SetupAxisLimits(ImAxis_X1, latest_ms - window_ms, latest_ms,
-                              ImPlotCond_Always);
-    }
-
-    for (auto &[name, s] : state_.series) {
-      if (s.points.empty())
-        continue;
-
-      thread_local std::vector<double> xs, ys;
-      xs.resize(s.points.size());
-      ys.resize(s.points.size());
-      for (size_t i = 0; i < s.points.size(); ++i) {
-        xs[i] = static_cast<double>(s.points[i].first);
-        ys[i] = s.points[i].second;
-      }
-      ImPlot::PlotLine(name.c_str(), xs.data(), ys.data(),
-                       static_cast<int>(xs.size()));
-    }
-
-    ImPlot::EndPlot();
-  }
-
   ImGui::End();
 }
 
