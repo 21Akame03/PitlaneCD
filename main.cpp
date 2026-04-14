@@ -46,9 +46,12 @@ static void glfw_error_callback(int error, const char *description) {
 
 // Main code
 int main(int, char **) {
+  fprintf(stderr, "[DBG] main() entered\n"); fflush(stderr);
   glfwSetErrorCallback(glfw_error_callback);
+  fprintf(stderr, "[DBG] calling glfwInit\n"); fflush(stderr);
   if (!glfwInit())
     return 1;
+  fprintf(stderr, "[DBG] glfwInit OK\n"); fflush(stderr);
 
   // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -80,20 +83,31 @@ int main(int, char **) {
 #endif
 
   // Create window with graphics context
-  float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(
-      glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
+  fprintf(stderr, "[DBG] getting primary monitor\n"); fflush(stderr);
+  GLFWmonitor* primary_monitor = glfwGetPrimaryMonitor();
+  fprintf(stderr, "[DBG] primary_monitor=%p\n", (void*)primary_monitor); fflush(stderr);
+  float main_scale = primary_monitor
+      ? ImGui_ImplGlfw_GetContentScaleForMonitor(primary_monitor)
+      : 1.0f;
+  fprintf(stderr, "[DBG] main_scale=%.2f, creating window\n", main_scale); fflush(stderr);
   GLFWwindow *window =
       glfwCreateWindow((int)(1280 * main_scale), (int)(800 * main_scale),
                        "Pitlane", nullptr, nullptr);
+  fprintf(stderr, "[DBG] window=%p\n", (void*)window); fflush(stderr);
   if (window == nullptr)
     return 1;
   glfwMakeContextCurrent(window);
+  fprintf(stderr, "[DBG] context current\n"); fflush(stderr);
   glfwSwapInterval(1); // Enable vsync
 
   // Setup Dear ImGui context
+  fprintf(stderr, "[DBG] ImGui CHECKVERSION\n"); fflush(stderr);
   IMGUI_CHECKVERSION();
+  fprintf(stderr, "[DBG] ImGui CreateContext\n"); fflush(stderr);
   ImGui::CreateContext();
+  fprintf(stderr, "[DBG] ImPlot CreateContext\n"); fflush(stderr);
   ImPlot::CreateContext();
+  fprintf(stderr, "[DBG] contexts created\n"); fflush(stderr);
   ImGuiIO &io = ImGui::GetIO();
   (void)io;
   io.ConfigFlags |=
@@ -101,8 +115,9 @@ int main(int, char **) {
   io.ConfigFlags |=
       ImGuiConfigFlags_NavEnableGamepad;              // Enable Gamepad Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
-  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport /
-                                                      // Platform Windows
+  // ViewportsEnable creates extra GL contexts per detached window — crashes on
+  // many Windows/driver combos. Docking still works without it.
+  // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
   // io.ConfigViewportsNoAutoMerge = true;
   // io.ConfigViewportsNoTaskBarIcon = true;
 
@@ -130,21 +145,24 @@ int main(int, char **) {
             // DPI changes.
 #endif
 
-  // When viewports are enabled we tweak WindowRounding/WindowBg so platform
-  // windows can look identical to regular ones.
-  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-    style.WindowRounding = 0.0f;
-    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-  }
 
   // Setup Platform/Renderer backends
+  fprintf(stderr, "[DBG] ImGui_ImplGlfw_InitForOpenGL\n"); fflush(stderr);
   ImGui_ImplGlfw_InitForOpenGL(window, true);
 #ifdef __EMSCRIPTEN__
   ImGui_ImplGlfw_InstallEmscriptenCallbacks(window, "#canvas");
 #endif
+  fprintf(stderr, "[DBG] ImGui_ImplOpenGL3_Init\n"); fflush(stderr);
   ImGui_ImplOpenGL3_Init(glsl_version);
+  fprintf(stderr, "[DBG] init complete, entering loop\n"); fflush(stderr);
 
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+  // Construct App here (not as a static local inside the loop) to avoid
+  // MinGW's pthread-backed once-guard which can crash on first use.
+  fprintf(stderr, "[DBG] constructing App\n"); fflush(stderr);
+  App app;
+  fprintf(stderr, "[DBG] App ready, entering loop\n"); fflush(stderr);
 
   // Main loop
 #ifdef __EMSCRIPTEN__
@@ -166,6 +184,7 @@ int main(int, char **) {
     // data to your main application, or clear/overwrite your copy of the
     // keyboard data. Generally you may always pass all inputs to dear imgui,
     // and hide them from your application based on those two flags.
+    fprintf(stderr, "[DBG] loop: glfwPollEvents\n"); fflush(stderr);
     glfwPollEvents();
     if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0) {
       ImGui_ImplGlfw_Sleep(10);
@@ -173,21 +192,27 @@ int main(int, char **) {
     }
 
     // Start the Dear ImGui frame
+    fprintf(stderr, "[DBG] loop: OpenGL3_NewFrame\n"); fflush(stderr);
     ImGui_ImplOpenGL3_NewFrame();
+    fprintf(stderr, "[DBG] loop: Glfw_NewFrame\n"); fflush(stderr);
     ImGui_ImplGlfw_NewFrame();
+    fprintf(stderr, "[DBG] loop: ImGui::NewFrame\n"); fflush(stderr);
     ImGui::NewFrame();
 
-    static App app;
+    fprintf(stderr, "[DBG] loop: App::RenderUI\n"); fflush(stderr);
     app.RenderUI();
+    fprintf(stderr, "[DBG] loop: ImGui::Render\n"); fflush(stderr);
 
     // Rendering
     ImGui::Render();
+    fprintf(stderr, "[DBG] loop: glViewport\n"); fflush(stderr);
     int display_w, display_h;
     glfwGetFramebufferSize(window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w,
                  clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
+    fprintf(stderr, "[DBG] loop: RenderDrawData\n"); fflush(stderr);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     // Update and Render additional Platform Windows
@@ -195,13 +220,16 @@ int main(int, char **) {
     // save/restore it to make it easier to paste this code elsewhere.
     //  For this specific demo app we could also call
     //  glfwMakeContextCurrent(window) directly)
+    fprintf(stderr, "[DBG] loop: UpdatePlatformWindows\n"); fflush(stderr);
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
       GLFWwindow *backup_current_context = glfwGetCurrentContext();
       ImGui::UpdatePlatformWindows();
+      fprintf(stderr, "[DBG] loop: RenderPlatformWindowsDefault\n"); fflush(stderr);
       ImGui::RenderPlatformWindowsDefault();
       glfwMakeContextCurrent(backup_current_context);
     }
 
+    fprintf(stderr, "[DBG] loop: SwapBuffers\n"); fflush(stderr);
     glfwSwapBuffers(window);
   }
 #ifdef __EMSCRIPTEN__

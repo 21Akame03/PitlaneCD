@@ -58,6 +58,29 @@ if(APPLE OR CMAKE_CROSSCOMPILING)
   )
   # Propagate into cache so vector_dbc's find_package(FLEX) picks it up
   set(FLEX_INCLUDE_DIRS "${FLEX_INCLUDE_DIR}" CACHE PATH "" FORCE)
+elseif(WIN32 AND NOT CMAKE_CROSSCOMPILING)
+  # On native Windows, probe common MSYS2 install locations first.
+  # This is a no-op if flex/bison are already on PATH (e.g. inside MSYS2 shell).
+  foreach(_msys "C:/msys64" "C:/msys2" "$ENV{MSYS_ROOT}")
+    if(EXISTS "${_msys}/usr/bin/flex.exe")
+      find_program(FLEX_EXECUTABLE flex
+        HINTS "${_msys}/usr/bin"
+        NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+      find_program(BISON_EXECUTABLE bison
+        HINTS "${_msys}/usr/bin"
+        NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+      find_path(FLEX_INCLUDE_DIR FlexLexer.h
+        HINTS "${_msys}/usr/include"
+        NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+      set(FLEX_INCLUDE_DIRS "${FLEX_INCLUDE_DIR}" CACHE PATH "" FORCE)
+      break()
+    endif()
+  endforeach()
+  # Fallback: WinFlexBison (choco) or any flex/bison already on system PATH.
+  if(NOT FLEX_EXECUTABLE)
+    find_program(FLEX_EXECUTABLE  NAMES flex win_flex)
+    find_program(BISON_EXECUTABLE NAMES bison win_bison)
+  endif()
 endif()
 
 # Disable vector_dbc extras we don't need
@@ -194,4 +217,24 @@ elseif(WIN32)
     ws2_32
     wsock32
   )
+  if(MINGW)
+    # Statically link libgcc/libstdc++ so those DLLs don't need to ship.
+    target_link_options(glfw_opengl3 PRIVATE -static-libgcc -static-libstdc++)
+
+    # Always copy libwinpthread-1.dll next to the exe so it runs outside MSYS2.
+    # Static linking libwinpthread is unreliable across MinGW builds, so we
+    # unconditionally ship the DLL instead.
+    find_file(WINPTHREAD_DLL libwinpthread-1.dll
+      HINTS "C:/msys64/mingw64/bin" "C:/msys2/mingw64/bin"
+      NO_DEFAULT_PATH)
+    if(WINPTHREAD_DLL)
+      add_custom_command(TARGET glfw_opengl3 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+          "${WINPTHREAD_DLL}" $<TARGET_FILE_DIR:glfw_opengl3>
+        COMMENT "Copying libwinpthread-1.dll to output dir")
+      message(STATUS "MinGW: will copy ${WINPTHREAD_DLL} next to exe")
+    else()
+      message(WARNING "MinGW: libwinpthread-1.dll not found — exe may fail to run outside MSYS2")
+    endif()
+  endif()
 endif()
