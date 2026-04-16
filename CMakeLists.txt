@@ -241,6 +241,11 @@ elseif(WIN32)
     else()
       message(WARNING "MinGW: libwinpthread.a not found — exe will need the DLL")
     endif()
+
+    # Always locate the DLL so the installer can bundle it if needed.
+    find_file(WINPTHREAD_DLL libwinpthread-1.dll
+      HINTS "C:/msys64/mingw64/bin" "C:/msys2/mingw64/bin"
+      NO_DEFAULT_PATH)
   endif()
 endif()
 
