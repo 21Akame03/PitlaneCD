@@ -242,10 +242,19 @@ elseif(WIN32)
       message(WARNING "MinGW: libwinpthread.a not found — exe will need the DLL")
     endif()
 
-    # Always locate the DLL so the installer can bundle it if needed.
+    # Always locate the DLL — needed for both the post-build copy and installer.
     find_file(WINPTHREAD_DLL libwinpthread-1.dll
       HINTS "C:/msys64/mingw64/bin" "C:/msys2/mingw64/bin"
       NO_DEFAULT_PATH)
+
+    # Copy the DLL next to the exe in the build directory after every build
+    # so the app can be run directly without installing.
+    if(WINPTHREAD_DLL)
+      add_custom_command(TARGET glfw_opengl3 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+          "${WINPTHREAD_DLL}" $<TARGET_FILE_DIR:glfw_opengl3>
+        COMMENT "Copying libwinpthread-1.dll to build output dir")
+    endif()
   endif()
 endif()
 
