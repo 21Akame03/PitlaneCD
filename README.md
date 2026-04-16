@@ -15,9 +15,9 @@ Compatible with **ESP32** and **STM32** (and generally anything that can stream 
 |----|-------------|--------|
 | macOS | ARM (Apple Silicon) | Supported |
 | macOS | x86_64 | Supported |
-| Linux | x86_64 | Supported |
-| Linux | ARM64 | Supported |
-| Windows | x86_64 | Supported |
+| Linux | x86_64 | *Supported |
+| Linux | ARM64 | Not Supported |
+| Windows | x86_64 | Not Supported |
 | Windows | ARM64 | Experimental (GLFW 3.4+) |
 
 ## Building

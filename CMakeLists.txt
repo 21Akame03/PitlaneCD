@@ -58,6 +58,29 @@ if(APPLE OR CMAKE_CROSSCOMPILING)
   )
   # Propagate into cache so vector_dbc's find_package(FLEX) picks it up
   set(FLEX_INCLUDE_DIRS "${FLEX_INCLUDE_DIR}" CACHE PATH "" FORCE)
+elseif(WIN32 AND NOT CMAKE_CROSSCOMPILING)
+  # On native Windows, probe common MSYS2 install locations first.
+  # This is a no-op if flex/bison are already on PATH (e.g. inside MSYS2 shell).
+  foreach(_msys "C:/msys64" "C:/msys2" "$ENV{MSYS_ROOT}")
+    if(EXISTS "${_msys}/usr/bin/flex.exe")
+      find_program(FLEX_EXECUTABLE flex
+        HINTS "${_msys}/usr/bin"
+        NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+      find_program(BISON_EXECUTABLE bison
+        HINTS "${_msys}/usr/bin"
+        NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+      find_path(FLEX_INCLUDE_DIR FlexLexer.h
+        HINTS "${_msys}/usr/include"
+        NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+      set(FLEX_INCLUDE_DIRS "${FLEX_INCLUDE_DIR}" CACHE PATH "" FORCE)
+      break()
+    endif()
+  endforeach()
+  # Fallback: WinFlexBison (choco) or any flex/bison already on system PATH.
+  if(NOT FLEX_EXECUTABLE)
+    find_program(FLEX_EXECUTABLE  NAMES flex win_flex)
+    find_program(BISON_EXECUTABLE NAMES bison win_bison)
+  endif()
 endif()
 
 # Disable vector_dbc extras we don't need
@@ -132,6 +155,9 @@ add_executable(glfw_opengl3
   ${IMGUIFILEDIALOG_SOURCES}
 )
 
+# Rename the output binary to PitlaneCD
+set_target_properties(glfw_opengl3 PROPERTIES OUTPUT_NAME "PitlaneCD")
+
 target_include_directories(glfw_opengl3 PRIVATE
   ${IMGUI_DIR}
   ${IMGUI_DIR}/backends
@@ -194,4 +220,70 @@ elseif(WIN32)
     ws2_32
     wsock32
   )
+  if(MINGW)
+    # Statically link libgcc/libstdc++.
+    target_link_options(glfw_opengl3 PRIVATE -static-libgcc -static-libstdc++)
+
+    # Statically link libwinpthread.
+    # Two-part trick:
+    #   1. Link libwinpthread.a directly by path — ld always treats an explicit
+    #      .a path as static, regardless of -Bstatic/-Bdynamic state.
+    #   2. --as-needed tells ld to skip recording a DLL import if all its symbols
+    #      are already satisfied — so the compiler's automatic -lwinpthread (dynamic)
+    #      at the end of the link command becomes a no-op.
+    target_link_options(glfw_opengl3 PRIVATE -Wl,--as-needed)
+    find_library(WINPTHREAD_STATIC libwinpthread.a
+      HINTS "C:/msys64/mingw64/lib" "C:/msys2/mingw64/lib"
+      NO_DEFAULT_PATH)
+    if(WINPTHREAD_STATIC)
+      target_link_libraries(glfw_opengl3 PRIVATE "${WINPTHREAD_STATIC}")
+      message(STATUS "MinGW: linking winpthread statically from ${WINPTHREAD_STATIC}")
+    else()
+      message(WARNING "MinGW: libwinpthread.a not found — exe will need the DLL")
+    endif()
+
+    # Always locate the DLL so the installer can bundle it if needed.
+    find_file(WINPTHREAD_DLL libwinpthread-1.dll
+      HINTS "C:/msys64/mingw64/bin" "C:/msys2/mingw64/bin"
+      NO_DEFAULT_PATH)
+  endif()
+endif()
+
+# --------------------------------------------------------------------------
+# Installer (Windows only, requires NSIS: pacman -S mingw-w64-x86_64-nsis)
+# Build with: cmake --build build --target package
+# --------------------------------------------------------------------------
+if(WIN32)
+  install(TARGETS glfw_opengl3
+    RUNTIME DESTINATION "."
+  )
+
+  # Include winpthread DLL if it couldn't be linked statically
+  if(WINPTHREAD_DLL)
+    install(FILES "${WINPTHREAD_DLL}" DESTINATION ".")
+  endif()
+
+  set(CPACK_GENERATOR "NSIS")
+  set(CPACK_PACKAGE_NAME "PitlaneCD")
+  set(CPACK_PACKAGE_VENDOR "PitlaneCD")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CAN bus analyser and data logger")
+  set(CPACK_PACKAGE_VERSION "1.0.0")
+  set(CPACK_PACKAGE_VERSION_MAJOR "1")
+  set(CPACK_PACKAGE_VERSION_MINOR "0")
+  set(CPACK_PACKAGE_VERSION_PATCH "0")
+  set(CPACK_PACKAGE_INSTALL_DIRECTORY "PitlaneCD")
+  set(CPACK_PACKAGE_EXECUTABLES "PitlaneCD" "PitlaneCD")
+
+  # NSIS-specific
+  set(CPACK_NSIS_DISPLAY_NAME "PitlaneCD")
+  set(CPACK_NSIS_PACKAGE_NAME "PitlaneCD")
+  set(CPACK_NSIS_MUI_FINISHPAGE_RUN "PitlaneCD.exe")
+  set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+  # Start Menu shortcut
+  set(CPACK_NSIS_CREATE_ICONS_EXTRA
+    "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\PitlaneCD.lnk' '$INSTDIR\\\\PitlaneCD.exe'")
+  set(CPACK_NSIS_DELETE_ICONS_EXTRA
+    "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\PitlaneCD.lnk'")
+
+  include(CPack)
 endif()
