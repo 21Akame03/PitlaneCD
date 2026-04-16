@@ -155,6 +155,9 @@ add_executable(glfw_opengl3
   ${IMGUIFILEDIALOG_SOURCES}
 )
 
+# Rename the output binary to PitlaneCD
+set_target_properties(glfw_opengl3 PROPERTIES OUTPUT_NAME "PitlaneCD")
+
 target_include_directories(glfw_opengl3 PRIVATE
   ${IMGUI_DIR}
   ${IMGUI_DIR}/backends
@@ -218,15 +221,64 @@ elseif(WIN32)
     wsock32
   )
   if(MINGW)
-    # Statically link the MinGW runtime so no external DLLs are needed.
-    # -static-libgcc/-static-libstdc++ handle the C/C++ runtimes.
-    # -Wl,-Bstatic,-lwinpthread,-Bdynamic forces winpthread to be pulled from
-    # the static archive (libwinpthread.a) while leaving everything else dynamic.
-    target_link_options(glfw_opengl3 PRIVATE
-      -static-libgcc
-      -static-libstdc++
-      -Wl,-Bstatic,-lwinpthread,-Bdynamic
-    )
-    message(STATUS "MinGW: linking libgcc, libstdc++, and libwinpthread statically")
+    # Statically link libgcc/libstdc++.
+    target_link_options(glfw_opengl3 PRIVATE -static-libgcc -static-libstdc++)
+
+    # Statically link libwinpthread.
+    # Two-part trick:
+    #   1. Link libwinpthread.a directly by path — ld always treats an explicit
+    #      .a path as static, regardless of -Bstatic/-Bdynamic state.
+    #   2. --as-needed tells ld to skip recording a DLL import if all its symbols
+    #      are already satisfied — so the compiler's automatic -lwinpthread (dynamic)
+    #      at the end of the link command becomes a no-op.
+    target_link_options(glfw_opengl3 PRIVATE -Wl,--as-needed)
+    find_library(WINPTHREAD_STATIC libwinpthread.a
+      HINTS "C:/msys64/mingw64/lib" "C:/msys2/mingw64/lib"
+      NO_DEFAULT_PATH)
+    if(WINPTHREAD_STATIC)
+      target_link_libraries(glfw_opengl3 PRIVATE "${WINPTHREAD_STATIC}")
+      message(STATUS "MinGW: linking winpthread statically from ${WINPTHREAD_STATIC}")
+    else()
+      message(WARNING "MinGW: libwinpthread.a not found — exe will need the DLL")
+    endif()
   endif()
+endif()
+
+# --------------------------------------------------------------------------
+# Installer (Windows only, requires NSIS: pacman -S mingw-w64-x86_64-nsis)
+# Build with: cmake --build build --target package
+# --------------------------------------------------------------------------
+if(WIN32)
+  install(TARGETS glfw_opengl3
+    RUNTIME DESTINATION "."
+  )
+
+  # Include winpthread DLL if it couldn't be linked statically
+  if(WINPTHREAD_DLL)
+    install(FILES "${WINPTHREAD_DLL}" DESTINATION ".")
+  endif()
+
+  set(CPACK_GENERATOR "NSIS")
+  set(CPACK_PACKAGE_NAME "PitlaneCD")
+  set(CPACK_PACKAGE_VENDOR "PitlaneCD")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CAN bus analyser and data logger")
+  set(CPACK_PACKAGE_VERSION "1.0.0")
+  set(CPACK_PACKAGE_VERSION_MAJOR "1")
+  set(CPACK_PACKAGE_VERSION_MINOR "0")
+  set(CPACK_PACKAGE_VERSION_PATCH "0")
+  set(CPACK_PACKAGE_INSTALL_DIRECTORY "PitlaneCD")
+  set(CPACK_PACKAGE_EXECUTABLES "PitlaneCD" "PitlaneCD")
+
+  # NSIS-specific
+  set(CPACK_NSIS_DISPLAY_NAME "PitlaneCD")
+  set(CPACK_NSIS_PACKAGE_NAME "PitlaneCD")
+  set(CPACK_NSIS_MUI_FINISHPAGE_RUN "PitlaneCD.exe")
+  set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+  # Start Menu shortcut
+  set(CPACK_NSIS_CREATE_ICONS_EXTRA
+    "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\PitlaneCD.lnk' '$INSTDIR\\\\PitlaneCD.exe'")
+  set(CPACK_NSIS_DELETE_ICONS_EXTRA
+    "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\PitlaneCD.lnk'")
+
+  include(CPack)
 endif()
