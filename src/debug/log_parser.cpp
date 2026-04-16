@@ -1,8 +1,6 @@
 #include "debug/log_parser.hpp"
 
-#include <cstdlib>
-#include <cstring>
-#include <sstream>
+#include "nlohmann/json.hpp"
 
 namespace debug {
 
@@ -37,85 +35,30 @@ void LevelColor(LogLevel lvl, float &r, float &g, float &b, float &a) {
   }
 }
 
-static bool TryParseDouble(const std::string &s, double &out) {
-  char *end = nullptr;
-  out = std::strtod(s.c_str(), &end);
-  return end != s.c_str() && *end == '\0';
-}
-
-static void ParseKVPairs(const std::string &kv_str,
-                         std::unordered_map<std::string, double> &out) {
-  std::istringstream ss(kv_str);
-  std::string token;
-  while (ss >> token) {
-    auto eq = token.find('=');
-    if (eq == std::string::npos || eq == 0 || eq == token.size() - 1)
-      continue;
-    std::string key = token.substr(0, eq);
-    std::string val_str = token.substr(eq + 1);
-    double val;
-    if (TryParseDouble(val_str, val)) {
-      out[key] = val;
-    }
-  }
-}
-
+// Expected JSON format: {"ts":12345,"lvl":"I","tag":"MOTOR","msg":"speed nominal","rpm":3200,"temp":85.3}
+// Any numeric field besides ts/lvl/tag/msg is treated as a plottable value.
 bool ParseLine(const std::string &line, LogEntry &out) {
-  const char *p = line.c_str();
+  auto j = nlohmann::json::parse(line, nullptr, false);
+  if (j.is_discarded())
+    return false;
 
-  while (*p == ' ' || *p == '\t')
-    ++p;
-  if (*p != '[')
+  if (!j.contains("ts") || !j.contains("lvl") || !j.contains("tag"))
     return false;
-  ++p;
 
-  const char *ts_start = p;
-  while (*p >= '0' && *p <= '9')
-    ++p;
-  if (p == ts_start || *p != ']')
-    return false;
-  out.timestamp_ms = static_cast<uint32_t>(std::strtoul(ts_start, nullptr, 10));
-  ++p;
+  out.timestamp_ms = j["ts"].get<uint32_t>();
 
-  while (*p == ' ' || *p == '\t')
-    ++p;
-  if (*p != '[')
-    return false;
-  ++p;
-  char lvl = *p;
-  if (lvl != 'D' && lvl != 'I' && lvl != 'W' && lvl != 'E')
-    return false;
-  out.level = CharToLevel(lvl);
-  ++p;
-  if (*p != ']')
-    return false;
-  ++p;
+  std::string lvl_str = j["lvl"].get<std::string>();
+  out.level = lvl_str.empty() ? LogLevel::UNKNOWN : CharToLevel(lvl_str[0]);
 
-  while (*p == ' ' || *p == '\t')
-    ++p;
-  if (*p != '[')
-    return false;
-  ++p;
-  const char *tag_start = p;
-  while (*p && *p != ']')
-    ++p;
-  if (*p != ']' || p == tag_start)
-    return false;
-  out.tag.assign(tag_start, p);
-  ++p;
+  out.tag = j["tag"].get<std::string>();
+  out.message = j.value("msg", "");
 
-  while (*p == ' ' || *p == '\t')
-    ++p;
-
-  std::string rest(p);
-  auto pipe = rest.find('|');
-  if (pipe != std::string::npos) {
-    out.message = rest.substr(0, pipe);
-    while (!out.message.empty() && out.message.back() == ' ')
-      out.message.pop_back();
-    ParseKVPairs(rest.substr(pipe + 1), out.values);
-  } else {
-    out.message = rest;
+  for (auto &[key, val] : j.items()) {
+    if (key == "ts" || key == "lvl" || key == "tag" || key == "msg")
+      continue;
+    if (val.is_number()) {
+      out.values[key] = val.get<double>();
+    }
   }
 
   return true;
@@ -131,6 +74,7 @@ void AppState::Feed(const std::string &raw_line) {
   if (!ParseLine(raw_line, entry))
     return;
 
+  // Build plot series from key=value pairs, namespaced by tag
   for (auto &[key, val] : entry.values) {
     std::string series_name = entry.tag + "." + key;
     auto &s = series[series_name];

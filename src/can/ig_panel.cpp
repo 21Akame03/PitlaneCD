@@ -48,6 +48,7 @@ void IgPanel::gen_tables() {
       ImGui::TableSetupColumn("Offset", ImGuiTableColumnFlags_None, 1.0f);
       ImGui::TableHeadersRow();
 
+      // Natural sort so e.g. "Cell2" comes before "Cell10"
       std::vector<std::pair<std::string, const Vector::DBC::Signal *>>
           sortedSigs;
       for (const auto &[sName, s] : msg.signals)
@@ -154,6 +155,7 @@ void IgPanel::render_ui() {
       ImGui::SetNextItemWidth(200.0f);
       ImGui::InputDouble("Physical Value", &inputValue, 0.1, 1.0, "%.4f");
 
+      // Clamp to DBC-defined range (skip if both are 0, meaning undefined)
       if (selSignal->minimum != 0.0 || selSignal->maximum != 0.0) {
         if (inputValue < selSignal->minimum)
           inputValue = selSignal->minimum;
@@ -163,6 +165,7 @@ void IgPanel::render_ui() {
 
       ImGui::SameLine();
       if (ImGui::Button("Send")) {
+        // Encode the physical value back into raw CAN bytes and ship it out
         double rawValue = selSignal->physicalToRawValue(inputValue);
         std::vector<uint8_t> buffer(selMsg->size, 0);
         uint64_t rawU64 =
@@ -177,6 +180,7 @@ void IgPanel::render_ui() {
           hexData += hex;
         }
 
+        // Same JSON format the MCU expects: {"id": ..., "data": "AABB..."}
         nlohmann::json j;
         j["id"] = selMsg->id;
         j["data"] = hexData;

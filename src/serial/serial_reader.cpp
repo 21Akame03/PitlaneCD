@@ -12,6 +12,7 @@ SerialReader::SerialReader() : running_(false) {}
 SerialReader::~SerialReader() { Stop(); }
 
 bool SerialReader::Start(const std::string &portname, unsigned int baudrate) {
+  // Only allow one active connection at a time
   bool expected = false;
   if (!running_.compare_exchange_strong(expected, true))
     return false;
@@ -19,6 +20,7 @@ bool SerialReader::Start(const std::string &portname, unsigned int baudrate) {
   return true;
 }
 
+// Drain the entire buffer so the caller gets everything since last poll
 std::deque<std::string> SerialReader::PollRxBuffer() {
   std::lock_guard<std::mutex> lk(rx_mtx_);
   std::deque<std::string> out;
@@ -56,6 +58,7 @@ void SerialReader::Run(std::string portname, unsigned int baudrate) {
       return;
     }
 
+    // Expose serial/io to other threads so Send() and Stop() can reach them
     {
       std::lock_guard<std::mutex> lk(serial_mtx_);
       active_serial_ = &serial;
@@ -84,6 +87,7 @@ void SerialReader::Run(std::string portname, unsigned int baudrate) {
             {
               std::lock_guard<std::mutex> lk(rx_mtx_);
               rx_buffer_.push_back(std::move(line));
+              // Cap buffer so slow consumers don't eat all memory
               if (rx_buffer_.size() > 2000) {
                 rx_buffer_.pop_front();
               }
@@ -114,11 +118,13 @@ void SerialReader::Run(std::string portname, unsigned int baudrate) {
   }
 }
 
+// Post write to the io_context thread so we don't block the UI
 void SerialReader::Send(const std::string &data) {
   std::lock_guard<std::mutex> lk(serial_mtx_);
   if (!active_io_ || !active_serial_ || !running_.load(std::memory_order_acquire))
     return;
 
+  // shared_ptr keeps the buffer alive until the async write completes
   auto buf = std::make_shared<std::string>(data);
   boost::asio::post(*active_io_, [this, buf]() {
     boost::system::error_code ec;
@@ -130,6 +136,7 @@ void SerialReader::Send(const std::string &data) {
   });
 }
 
+// Cancel pending reads and tear down the io_context so Run() exits cleanly
 void SerialReader::Stop() {
   if (!running_.exchange(false))
     return;

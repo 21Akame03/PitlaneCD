@@ -3,6 +3,8 @@
 
 #include "debug/log_parser.hpp"
 #include "serial/serial_reader.hpp"
+#include "ui/data_plotter.hpp"
+#include <vector>
 
 namespace debug {
 
@@ -17,13 +19,12 @@ private:
   AppState state_;
   serial::SerialReader &reader_;
   bool auto_scroll_;
-  bool plot_follow_;
-  bool plot_fit_requested_;
-  float plot_history_secs_;
   char filter_buf_[256];
 
+  std::vector<ui::DataPlotter> plotters_;
+  int next_plot_id_ = 1;
+
   void render_log_window();
-  void render_plot_window();
 };
 
 } // namespace debug
