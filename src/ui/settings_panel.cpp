@@ -20,8 +20,14 @@ static const char *comport_combo_getter(void *data, int idx) {
 }
 
 void SettingsPanel::connection_selector() {
-  if (com_ports_[current_port_] == "Disconnected") {
-    com_ports_ = serial::list_serial_ports();
+  if (com_ports_.empty() || com_ports_[current_port_] == "Disconnected") {
+    auto found = serial::list_serial_ports();
+    if (!found.empty()) {
+      com_ports_ = std::move(found);
+      current_port_ = 0;
+    }
+    // If no ports found, keep the "Disconnected" placeholder so the vector
+    // is never empty and com_ports_[current_port_] is always valid.
   }
 
   ImGui::Combo("Interface", &current_port_, comport_combo_getter,

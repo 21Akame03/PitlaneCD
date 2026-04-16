@@ -218,23 +218,15 @@ elseif(WIN32)
     wsock32
   )
   if(MINGW)
-    # Statically link libgcc/libstdc++ so those DLLs don't need to ship.
-    target_link_options(glfw_opengl3 PRIVATE -static-libgcc -static-libstdc++)
-
-    # Always copy libwinpthread-1.dll next to the exe so it runs outside MSYS2.
-    # Static linking libwinpthread is unreliable across MinGW builds, so we
-    # unconditionally ship the DLL instead.
-    find_file(WINPTHREAD_DLL libwinpthread-1.dll
-      HINTS "C:/msys64/mingw64/bin" "C:/msys2/mingw64/bin"
-      NO_DEFAULT_PATH)
-    if(WINPTHREAD_DLL)
-      add_custom_command(TARGET glfw_opengl3 POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-          "${WINPTHREAD_DLL}" $<TARGET_FILE_DIR:glfw_opengl3>
-        COMMENT "Copying libwinpthread-1.dll to output dir")
-      message(STATUS "MinGW: will copy ${WINPTHREAD_DLL} next to exe")
-    else()
-      message(WARNING "MinGW: libwinpthread-1.dll not found — exe may fail to run outside MSYS2")
-    endif()
+    # Statically link the MinGW runtime so no external DLLs are needed.
+    # -static-libgcc/-static-libstdc++ handle the C/C++ runtimes.
+    # -Wl,-Bstatic,-lwinpthread,-Bdynamic forces winpthread to be pulled from
+    # the static archive (libwinpthread.a) while leaving everything else dynamic.
+    target_link_options(glfw_opengl3 PRIVATE
+      -static-libgcc
+      -static-libstdc++
+      -Wl,-Bstatic,-lwinpthread,-Bdynamic
+    )
+    message(STATUS "MinGW: linking libgcc, libstdc++, and libwinpthread statically")
   endif()
 endif()
