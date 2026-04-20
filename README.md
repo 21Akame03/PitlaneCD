@@ -1,5 +1,8 @@
 # Pitlane_ControlDesk
-[![Build](https://github.com/21Akame03/Pitlane_ControlDesk/actions/workflows/build.yml/badge.svg)](https://github.com/21Akame03/Pitlane_ControlDesk/actions/workflows/build.yml)
+
+<p align="center">
+  <img src="/assets/pitlane_2.png" alt="E-Traxx Cover" width="100%">
+</p>
 
 ControlDesk-like development UI for **pitlane_rs**.
 
