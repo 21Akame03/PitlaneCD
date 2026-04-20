@@ -27,6 +27,9 @@ private:
   bool open_ = true;
   bool follow_ = true;
   bool fit_requested_ = false;
+  bool auto_fit_ = false;
+  bool show_max_ = false;
+  bool show_min_ = false;
   float history_secs_ = 10.0f;
 };
 
