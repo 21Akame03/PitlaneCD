@@ -37,6 +37,11 @@ FetchContent_Declare (
   GIT_TAG v3.12.0
 )
 FetchContent_Declare(
+  mdflib
+  GIT_REPOSITORY https://github.com/ihedvall/mdflib.git
+  GIT_TAG main
+)
+FetchContent_Declare(
   boost
   URL https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-cmake.tar.gz
   EXCLUDE_FROM_ALL
@@ -102,7 +107,31 @@ endif()
 
 # Only fetch the Boost libraries we actually need
 set(BOOST_INCLUDE_LIBRARIES asio system CACHE STRING "" FORCE)
-FetchContent_MakeAvailable(imgui implot ImGuiFileDialog nl_json boost)
+
+# mdflib build options — library only, no tools/tests/docs
+set(MDF_BUILD_TOOL OFF CACHE BOOL "" FORCE)
+set(MDF_BUILD_TEST OFF CACHE BOOL "" FORCE)
+set(MDF_BUILD_DOC OFF CACHE BOOL "" FORCE)
+set(MDF_BUILD_SHARED_LIB OFF CACHE BOOL "" FORCE)
+
+# mdflib needs ZLIB and EXPAT. On macOS these live in the SDK as .tbd stubs
+# that CMake's FindZLIB/FindEXPAT don't probe by default — point them at it.
+if(APPLE AND NOT CMAKE_CROSSCOMPILING)
+  execute_process(COMMAND xcrun --show-sdk-path
+    OUTPUT_VARIABLE _macos_sdk OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(_macos_sdk)
+    if(NOT ZLIB_LIBRARY)
+      set(ZLIB_LIBRARY "${_macos_sdk}/usr/lib/libz.tbd" CACHE FILEPATH "" FORCE)
+      set(ZLIB_INCLUDE_DIR "${_macos_sdk}/usr/include" CACHE PATH "" FORCE)
+    endif()
+    if(NOT EXPAT_LIBRARY)
+      set(EXPAT_LIBRARY "${_macos_sdk}/usr/lib/libexpat.tbd" CACHE FILEPATH "" FORCE)
+      set(EXPAT_INCLUDE_DIR "${_macos_sdk}/usr/include" CACHE PATH "" FORCE)
+    endif()
+  endif()
+endif()
+
+FetchContent_MakeAvailable(imgui implot ImGuiFileDialog nl_json boost mdflib)
 
 # Ensure vector_dbc finds its own headers when used as a subproject
 if(TARGET Vector_DBC)
@@ -202,6 +231,7 @@ target_link_libraries(glfw_opengl3 PRIVATE
   OpenGL::GL
   ${GLFW_TARGET}
   Vector_DBC
+  mdf
   nlohmann_json::nlohmann_json
   Boost::asio
 )
