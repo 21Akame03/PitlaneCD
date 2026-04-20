@@ -1,5 +1,8 @@
 # Pitlane_ControlDesk
-[![Build](https://github.com/21Akame03/Pitlane_ControlDesk/actions/workflows/build.yml/badge.svg)](https://github.com/21Akame03/Pitlane_ControlDesk/actions/workflows/build.yml)
+
+<p align="center">
+  <img src="/assets/pitlane_2.png" alt="E-Traxx Cover" width="100%">
+</p>
 
 ControlDesk-like development UI for **pitlane_rs**.
 
@@ -15,9 +18,9 @@ Compatible with **ESP32** and **STM32** (and generally anything that can stream 
 |----|-------------|--------|
 | macOS | ARM (Apple Silicon) | Supported |
 | macOS | x86_64 | Supported |
-| Linux | x86_64 | Supported |
-| Linux | ARM64 | Supported |
-| Windows | x86_64 | Supported |
+| Linux | x86_64 | *Supported |
+| Linux | ARM64 | Not Supported |
+| Windows | x86_64 | Not Supported |
 | Windows | ARM64 | Experimental (GLFW 3.4+) |
 
 ## Building
@@ -63,7 +66,7 @@ cmake --build build
 
 > **Note:** On Linux, GLFW is fetched from source if `libglfw3-dev` is not installed. Installing it via your package manager (`sudo apt install libglfw3-dev`) avoids the extra build time.
 
-### Windows
+### Windows (native)
 
 ```bash
 # Using Visual Studio Developer Command Prompt or MSYS2
@@ -75,6 +78,31 @@ cmake --build build
 ```
 
 > **Note:** GLFW and all other dependencies are fetched and built automatically. No manual dependency installation is required.
+
+### Windows (cross-compile from macOS)
+
+You can build a Windows `.exe` from macOS using the MinGW-w64 cross-compiler.
+
+```bash
+# Install MinGW-w64 and Boost (header-only, needed for boost::asio)
+brew install mingw-w64 boost
+
+# Configure with the provided MinGW toolchain file
+cmake -B build_win64 \
+  -DCMAKE_TOOLCHAIN_FILE=toolchain-mingw64.cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_DISABLE_FIND_PACKAGE_glfw3=ON \
+  -DFLEX_EXECUTABLE=/opt/homebrew/opt/flex/bin/flex \
+  -DFLEX_INCLUDE_DIR=/opt/homebrew/opt/flex/include \
+  -DCMAKE_CXX_FLAGS="-I/opt/homebrew/include"
+
+# Build
+cmake --build build_win64 --config Release -j$(sysctl -n hw.ncpu)
+```
+
+The output binary is at `build_win64/glfw_opengl3.exe` (PE32+ x86-64).
+
+> **Note:** `-DCMAKE_DISABLE_FIND_PACKAGE_glfw3=ON` forces GLFW to be built from source instead of picking up the macOS system install. The Boost include path is needed because `boost::asio` (used for serial communication) is header-only but not fetched via CMake.
 
 ### Cross-compiling (macOS Universal Binary)
 
