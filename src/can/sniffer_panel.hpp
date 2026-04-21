@@ -2,6 +2,7 @@
 #define SNIFFER_PANEL_HPP
 
 #include "can/dbc_parser.hpp"
+#include "logging/mdf_logger.hpp"
 #include "serial/serial_reader.hpp"
 #include "ui/app_log.hpp"
 
@@ -9,7 +10,8 @@ namespace can {
 
 class SnifferPanel {
 public:
-  SnifferPanel(DbcParser &parser, AppLog &log, serial::SerialReader &reader);
+  SnifferPanel(DbcParser &parser, AppLog &log, serial::SerialReader &reader,
+               logging::MdfLogger &mdf);
   void render_ui();
 
 private:
@@ -21,6 +23,7 @@ private:
   DbcParser &parser_;
   AppLog &log_;
   serial::SerialReader &reader_;
+  logging::MdfLogger &mdf_;
 };
 
 } // namespace can

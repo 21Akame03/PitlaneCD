@@ -37,6 +37,11 @@ FetchContent_Declare (
   GIT_TAG v3.12.0
 )
 FetchContent_Declare(
+  mdflib
+  GIT_REPOSITORY https://github.com/ihedvall/mdflib.git
+  GIT_TAG main
+)
+FetchContent_Declare(
   boost
   URL https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-cmake.tar.gz
   EXCLUDE_FROM_ALL
@@ -102,7 +107,31 @@ endif()
 
 # Only fetch the Boost libraries we actually need
 set(BOOST_INCLUDE_LIBRARIES asio system CACHE STRING "" FORCE)
-FetchContent_MakeAvailable(imgui implot ImGuiFileDialog nl_json boost)
+
+# mdflib build options — library only, no tools/tests/docs
+set(MDF_BUILD_TOOL OFF CACHE BOOL "" FORCE)
+set(MDF_BUILD_TEST OFF CACHE BOOL "" FORCE)
+set(MDF_BUILD_DOC OFF CACHE BOOL "" FORCE)
+set(MDF_BUILD_SHARED_LIB OFF CACHE BOOL "" FORCE)
+
+# mdflib needs ZLIB and EXPAT. On macOS these live in the SDK as .tbd stubs
+# that CMake's FindZLIB/FindEXPAT don't probe by default — point them at it.
+if(APPLE AND NOT CMAKE_CROSSCOMPILING)
+  execute_process(COMMAND xcrun --show-sdk-path
+    OUTPUT_VARIABLE _macos_sdk OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(_macos_sdk)
+    if(NOT ZLIB_LIBRARY)
+      set(ZLIB_LIBRARY "${_macos_sdk}/usr/lib/libz.tbd" CACHE FILEPATH "" FORCE)
+      set(ZLIB_INCLUDE_DIR "${_macos_sdk}/usr/include" CACHE PATH "" FORCE)
+    endif()
+    if(NOT EXPAT_LIBRARY)
+      set(EXPAT_LIBRARY "${_macos_sdk}/usr/lib/libexpat.tbd" CACHE FILEPATH "" FORCE)
+      set(EXPAT_INCLUDE_DIR "${_macos_sdk}/usr/include" CACHE PATH "" FORCE)
+    endif()
+  endif()
+endif()
+
+FetchContent_MakeAvailable(imgui implot ImGuiFileDialog nl_json boost mdflib)
 
 # Ensure vector_dbc finds its own headers when used as a subproject
 if(TARGET Vector_DBC)
@@ -158,6 +187,16 @@ add_executable(glfw_opengl3
 # Rename the output binary to PitlaneCD
 set_target_properties(glfw_opengl3 PROPERTIES OUTPUT_NAME "PitlaneCD")
 
+# Release mode: suppress the console/terminal window.
+#   - Windows: WIN32_EXECUTABLE makes it a GUI subsystem binary (no console).
+#   - macOS:   building as a .app bundle means double-click launch, no Terminal.
+set_target_properties(glfw_opengl3 PROPERTIES
+  WIN32_EXECUTABLE $<CONFIG:Release>
+)
+if(APPLE AND CMAKE_BUILD_TYPE STREQUAL "Release")
+  set_target_properties(glfw_opengl3 PROPERTIES MACOSX_BUNDLE TRUE)
+endif()
+
 target_include_directories(glfw_opengl3 PRIVATE
   ${IMGUI_DIR}
   ${IMGUI_DIR}/backends
@@ -202,6 +241,7 @@ target_link_libraries(glfw_opengl3 PRIVATE
   OpenGL::GL
   ${GLFW_TARGET}
   Vector_DBC
+  mdf
   nlohmann_json::nlohmann_json
   Boost::asio
 )
@@ -255,6 +295,64 @@ elseif(WIN32)
           "${WINPTHREAD_DLL}" $<TARGET_FILE_DIR:glfw_opengl3>
         COMMENT "Copying libwinpthread-1.dll to build output dir")
     endif()
+  endif()
+endif()
+
+# --------------------------------------------------------------------------
+# macOS: build .icns from Pitlane_logo.png, embed it in the .app bundle,
+# and package the bundle as a DMG via CPack (DragNDrop generator).
+# Build with: cmake --build build --target package
+# --------------------------------------------------------------------------
+if(APPLE)
+  set(_logo_png "${CMAKE_CURRENT_SOURCE_DIR}/assets/Pitlane_logo.png")
+  set(_iconset_dir "${CMAKE_CURRENT_BINARY_DIR}/PitlaneCD.iconset")
+  set(_icns "${CMAKE_CURRENT_BINARY_DIR}/PitlaneCD.icns")
+
+  # Generate the .icns at build time using Apple's sips + iconutil.
+  add_custom_command(OUTPUT "${_icns}"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${_iconset_dir}"
+    COMMAND sips -z 16 16     "${_logo_png}" --out "${_iconset_dir}/icon_16x16.png"
+    COMMAND sips -z 32 32     "${_logo_png}" --out "${_iconset_dir}/icon_16x16@2x.png"
+    COMMAND sips -z 32 32     "${_logo_png}" --out "${_iconset_dir}/icon_32x32.png"
+    COMMAND sips -z 64 64     "${_logo_png}" --out "${_iconset_dir}/icon_32x32@2x.png"
+    COMMAND sips -z 128 128   "${_logo_png}" --out "${_iconset_dir}/icon_128x128.png"
+    COMMAND sips -z 256 256   "${_logo_png}" --out "${_iconset_dir}/icon_128x128@2x.png"
+    COMMAND sips -z 256 256   "${_logo_png}" --out "${_iconset_dir}/icon_256x256.png"
+    COMMAND sips -z 512 512   "${_logo_png}" --out "${_iconset_dir}/icon_256x256@2x.png"
+    COMMAND sips -z 512 512   "${_logo_png}" --out "${_iconset_dir}/icon_512x512.png"
+    COMMAND iconutil -c icns -o "${_icns}" "${_iconset_dir}"
+    DEPENDS "${_logo_png}"
+    COMMENT "Generating PitlaneCD.icns from Pitlane_logo.png"
+    VERBATIM
+  )
+  add_custom_target(pitlanecd_icns ALL DEPENDS "${_icns}")
+  add_dependencies(glfw_opengl3 pitlanecd_icns)
+
+  # Bundle resources: icon + the raw PNG (used for the GLFW window icon at runtime).
+  set_source_files_properties("${_icns}" "${_logo_png}"
+    PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+  target_sources(glfw_opengl3 PRIVATE "${_icns}" "${_logo_png}")
+
+  set_target_properties(glfw_opengl3 PROPERTIES
+    MACOSX_BUNDLE_BUNDLE_NAME "PitlaneCD"
+    MACOSX_BUNDLE_GUI_IDENTIFIER "com.pitlanecd.app"
+    MACOSX_BUNDLE_ICON_FILE "PitlaneCD.icns"
+    MACOSX_BUNDLE_BUNDLE_VERSION "1.0.0"
+    MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0.0"
+  )
+
+  # Only wire the DMG install/CPack rules when we actually built a bundle.
+  if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    install(TARGETS glfw_opengl3 BUNDLE DESTINATION ".")
+
+    set(CPACK_GENERATOR "DragNDrop")
+    set(CPACK_PACKAGE_NAME "PitlaneCD")
+    set(CPACK_PACKAGE_VENDOR "PitlaneCD")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CAN bus analyser and data logger")
+    set(CPACK_PACKAGE_VERSION "1.0.0")
+    set(CPACK_PACKAGE_FILE_NAME "PitlaneCD-1.0.0")
+    set(CPACK_DMG_VOLUME_NAME "PitlaneCD")
+    include(CPack)
   endif()
 endif()
 

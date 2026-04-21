@@ -16,7 +16,7 @@ namespace can {
 struct CanFrame {
   uint32_t id;
   uint8_t dlc;
-  double value;
+  std::vector<uint8_t> data;
   std::string name;
 };
 

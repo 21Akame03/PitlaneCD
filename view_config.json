@@ -1,0 +1,58 @@
+{
+  "dbc_path": "",
+  "mode": "telemetry",
+  "plots": [
+    {
+      "auto_fit": true,
+      "follow": true,
+      "history_secs": 10.0,
+      "series": [
+        "DRV.steering_angle"
+      ],
+      "show_max": false,
+      "show_min": false
+    },
+    {
+      "auto_fit": true,
+      "follow": true,
+      "history_secs": 10.0,
+      "series": [
+        "INV.u1_torque",
+        "INV.u2_torque"
+      ],
+      "show_max": false,
+      "show_min": false
+    },
+    {
+      "auto_fit": true,
+      "follow": true,
+      "history_secs": 120.0,
+      "series": [
+        "INV.u1_speed",
+        "INV.u2_speed"
+      ],
+      "show_max": false,
+      "show_min": false
+    },
+    {
+      "auto_fit": true,
+      "follow": true,
+      "history_secs": 120.0,
+      "series": [
+        "TSAC.ts_current"
+      ],
+      "show_max": false,
+      "show_min": false
+    },
+    {
+      "auto_fit": true,
+      "follow": true,
+      "history_secs": 10.0,
+      "series": [
+        "TSAC.highest_cell_voltage"
+      ],
+      "show_max": false,
+      "show_min": false
+    }
+  ]
+}

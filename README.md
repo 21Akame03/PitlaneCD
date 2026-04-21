@@ -1,6 +1,10 @@
 # Pitlane_ControlDesk
 
 <p align="center">
+  <img src="/assets/Pitlane_logo.png" alt="Pitlane Logo" width="320">
+</p>
+
+<p align="center">
   <img src="/assets/pitlane_2.png" alt="E-Traxx Cover" width="100%">
 </p>
 

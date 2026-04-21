@@ -24,6 +24,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+#include <string>
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -32,6 +33,48 @@
 
 #include "app.hpp"
 #include "implot.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#include <libgen.h>
+#include <limits.h>
+#endif
+
+// Locate a bundled asset (e.g. the window icon) across dev and installed layouts.
+// Searches: CWD, executable dir, and — on macOS — the .app bundle's Resources dir.
+static std::string find_asset(const char* relative) {
+  const char* candidates[] = { "", "assets/", "../assets/" };
+  for (const char* prefix : candidates) {
+    std::string p = std::string(prefix) + relative;
+    FILE* f = fopen(p.c_str(), "rb");
+    if (f) { fclose(f); return p; }
+  }
+#ifdef __APPLE__
+  char exe[PATH_MAX]; uint32_t sz = sizeof(exe);
+  if (_NSGetExecutablePath(exe, &sz) == 0) {
+    std::string dir = dirname(exe);
+    std::string p = dir + "/../Resources/" + relative;
+    FILE* f = fopen(p.c_str(), "rb");
+    if (f) { fclose(f); return p; }
+  }
+#endif
+  return {};
+}
+
+static void set_window_icon(GLFWwindow* window, const char* path) {
+  if (path == nullptr || path[0] == '\0') return;
+  int w, h, ch;
+  unsigned char* pixels = stbi_load(path, &w, &h, &ch, 4);
+  if (!pixels) {
+    fprintf(stderr, "Failed to load window icon: %s\n", path);
+    return;
+  }
+  GLFWimage img{ w, h, pixels };
+  glfwSetWindowIcon(window, 1, &img);
+  stbi_image_free(pixels);
+}
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to
 // maximize ease of testing and compatibility with old VS compilers. To link
@@ -106,6 +149,7 @@ int main(int, char **) {
   fprintf(stderr, "[DBG] window=%p\n", (void*)window); fflush(stderr);
   if (window == nullptr)
     return 1;
+  set_window_icon(window, find_asset("Pitlane_logo.png").c_str());
   glfwMakeContextCurrent(window);
   fprintf(stderr, "[DBG] context current\n"); fflush(stderr);
   glfwSwapInterval(1); // Enable vsync

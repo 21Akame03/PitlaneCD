@@ -85,18 +85,26 @@ std::optional<CanFrame> DbcParser::parse_frame(const std::string &data) {
 
   if (json_frame.is_discarded())
     return std::nullopt;
-
-  if (!loaded_)
+  if (!json_frame.contains("id") || !json_frame.contains("data"))
     return std::nullopt;
 
   uint32_t id = json_frame["id"];
   std::string hex_data = json_frame["data"];
   std::vector<uint8_t> can_data = hex_to_bytes(hex_data);
 
+  CanFrame frame;
+  frame.id = id;
+  frame.dlc = static_cast<uint8_t>(can_data.size());
+  frame.data = can_data;
+
+  if (!loaded_)
+    return frame;
+
   auto message = find_message(id);
   if (!message)
-    return std::nullopt;
+    return frame;
 
+  frame.name = message->name;
   log("Message: %s\n", message->name.c_str());
 
   auto &msgData = signal_store_[id];
@@ -150,8 +158,7 @@ std::optional<CanFrame> DbcParser::parse_frame(const std::string &data) {
     }
   }
 
-  // We populate signal_store_ as a side-effect; no single CanFrame return needed
-  return std::nullopt;
+  return frame;
 }
 
 } // namespace can

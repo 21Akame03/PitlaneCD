@@ -215,10 +215,18 @@ __marimo__/
 *.out
 
 # CMake build directories
+build-release/
 build/
 cmake-build-*/
 _build/
+_deps/
 build_win64/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+Makefile
 # Compiled binaries (add specific names as needed)
 glfw_opengl3/example_glfw_opengl3
 
