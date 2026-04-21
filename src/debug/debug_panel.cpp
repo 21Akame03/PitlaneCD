@@ -6,8 +6,9 @@
 
 namespace debug {
 
-DebugPanel::DebugPanel(serial::SerialReader &reader)
-    : reader_(reader), auto_scroll_(true) {
+DebugPanel::DebugPanel(serial::SerialReader &reader, logging::MdfLogger &mdf,
+                       const ui::AppMode &mode)
+    : reader_(reader), mdf_(mdf), mode_(mode), auto_scroll_(true) {
   std::memset(filter_buf_, 0, sizeof(filter_buf_));
 }
 
@@ -30,7 +31,19 @@ std::vector<ui::PlotConfig> DebugPanel::export_plot_configs() const {
 
 void DebugPanel::render_ui() {
   auto lines = reader_.PollRxBuffer();
+  const bool log_telemetry =
+      mode_ == ui::AppMode::Telemetry &&
+      mdf_.mode() == logging::MdfLogger::Mode::TelemetrySignals;
   for (auto &line : lines) {
+    if (log_telemetry) {
+      LogEntry entry;
+      if (ParseLine(line, entry)) {
+        for (const auto &[key, val] : entry.values) {
+          mdf_.log_signal_sample(entry.tag + "." + key, val,
+                                 entry.timestamp_ms);
+        }
+      }
+    }
     state_.Feed(line);
   }
 

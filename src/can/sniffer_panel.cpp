@@ -10,8 +10,9 @@
 namespace can {
 
 SnifferPanel::SnifferPanel(DbcParser &parser, AppLog &log,
-                           serial::SerialReader &reader)
-    : parser_(parser), log_(log), reader_(reader) {}
+                           serial::SerialReader &reader,
+                           logging::MdfLogger &mdf)
+    : parser_(parser), log_(log), reader_(reader), mdf_(mdf) {}
 
 void SnifferPanel::render_signal_bar_plot(
     const char *plotTitle,
@@ -115,7 +116,10 @@ void SnifferPanel::render_ui() {
   // Poll serial and parse frames
   auto lines = reader_.PollRxBuffer();
   for (const auto &line : lines) {
-    parser_.parse_frame(line);
+    auto frame = parser_.parse_frame(line);
+    if (frame && mdf_.mode() == logging::MdfLogger::Mode::CanRaw) {
+      mdf_.log_can_frame(frame->id, frame->dlc, frame->data);
+    }
   }
 
   render_bar_plot();

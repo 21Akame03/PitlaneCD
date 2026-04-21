@@ -215,6 +215,7 @@ __marimo__/
 *.out
 
 # CMake build directories
+build-release/
 build/
 cmake-build-*/
 _build/

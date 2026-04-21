@@ -10,8 +10,43 @@ static const char *DBC_DIALOG_KEY = "dbc_file_dialog";
 static const char *SAVE_VIEW_DIALOG_KEY = "save_view_dialog";
 
 SettingsPanel::SettingsPanel(serial::SerialReader &reader,
-                             can::DbcParser &parser, AppMode &mode)
-    : reader_(reader), parser_(parser), mode_(mode) {}
+                             can::DbcParser &parser, AppMode &mode,
+                             logging::MdfLogger &mdf)
+    : reader_(reader), parser_(parser), mode_(mode), mdf_(mdf) {}
+
+// Auto-start on connect / auto-stop on disconnect. User can override with
+// the manual Start/Stop button in recording_controls().
+void SettingsPanel::auto_start_logging() {
+  if (is_connected_ && !was_connected_) {
+    if (mode_ == AppMode::CanSniffer) mdf_.start_can();
+    else if (mode_ == AppMode::Telemetry) mdf_.start_telemetry();
+  } else if (!is_connected_ && was_connected_) {
+    if (mdf_.is_recording()) mdf_.stop();
+  }
+  was_connected_ = is_connected_;
+}
+
+void SettingsPanel::recording_controls() {
+  if (mode_ != AppMode::CanSniffer && mode_ != AppMode::Telemetry) return;
+
+  ImGui::SeparatorText("Recording (MDF4)");
+
+  const bool recording = mdf_.is_recording();
+  if (recording) {
+    if (ImGui::Button("Stop Recording")) {
+      mdf_.stop();
+    }
+    ImGui::SameLine();
+    ImGui::TextDisabled("%s", mdf_.current_path().c_str());
+  } else {
+    const char *label = mode_ == AppMode::CanSniffer ? "Start Recording (CAN)"
+                                                      : "Start Recording";
+    if (ImGui::Button(label)) {
+      if (mode_ == AppMode::CanSniffer) mdf_.start_can();
+      else mdf_.start_telemetry();
+    }
+  }
+}
 
 static const char *comport_combo_getter(void *data, int idx) {
   auto &v = *static_cast<std::vector<std::string> *>(data);
@@ -45,6 +80,8 @@ void SettingsPanel::connection_selector() {
   } else {
     reader_.Stop();
   }
+
+  auto_start_logging();
 }
 
 void SettingsPanel::dbc_selector() {
@@ -102,6 +139,8 @@ void SettingsPanel::render_ui() {
       on_new_plot_();
     }
   }
+
+  recording_controls();
 
   if (mode_ != AppMode::None) {
     ImGui::SeparatorText("View");

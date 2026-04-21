@@ -5,6 +5,7 @@
 #include "can/ig_panel.hpp"
 #include "can/sniffer_panel.hpp"
 #include "debug/debug_panel.hpp"
+#include "logging/mdf_logger.hpp"
 #include "serial/serial_reader.hpp"
 #include "ui/app_log.hpp"
 #include "ui/settings_panel.hpp"
@@ -16,6 +17,7 @@ struct App {
   serial::SerialReader serial_reader;
   can::DbcParser dbc_parser;
   AppLog log;
+  logging::MdfLogger mdf_logger;
 
   can::SnifferPanel sniffer;
   can::IgPanel ig;

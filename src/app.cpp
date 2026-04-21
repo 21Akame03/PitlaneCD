@@ -10,10 +10,14 @@ static const char *LOAD_VIEW_DIALOG_KEY = "load_view_dialog";
 // DO NOT CHANGE ANYTHING WITH DOCKING
 
 App::App()
-    : sniffer(dbc_parser, log, serial_reader), ig(dbc_parser, serial_reader),
-      debug(serial_reader), settings(serial_reader, dbc_parser, mode) {
+    : sniffer(dbc_parser, log, serial_reader, mdf_logger),
+      ig(dbc_parser, serial_reader),
+      debug(serial_reader, mdf_logger, mode),
+      settings(serial_reader, dbc_parser, mode, mdf_logger) {
   dbc_parser.set_log_callback(
       [this](const std::string &msg) { log.AddLog("%s", msg.c_str()); });
+  mdf_logger.set_log_callback(
+      [this](const std::string &msg) { log.AddLog("%s\n", msg.c_str()); });
   settings.set_on_new_plot([this]() { debug.add_plot(); });
   settings.set_on_save_view(
       [this](const std::string &path) { save_current_view(path); });
