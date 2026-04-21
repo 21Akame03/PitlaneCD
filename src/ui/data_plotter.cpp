@@ -9,6 +9,25 @@ DataPlotter::DataPlotter(
     const std::unordered_map<std::string, debug::PlotSeries> &series)
     : id_(id), series_(&series) {}
 
+DataPlotter::DataPlotter(
+    int id,
+    const std::unordered_map<std::string, debug::PlotSeries> &series,
+    const PlotConfig &cfg)
+    : id_(id), series_(&series), enabled_series_(cfg.enabled_series),
+      follow_(cfg.follow), auto_fit_(cfg.auto_fit), show_max_(cfg.show_max),
+      show_min_(cfg.show_min), history_secs_(cfg.history_secs) {}
+
+PlotConfig DataPlotter::export_config() const {
+  PlotConfig c;
+  c.enabled_series = enabled_series_;
+  c.history_secs = history_secs_;
+  c.follow = follow_;
+  c.auto_fit = auto_fit_;
+  c.show_max = show_max_;
+  c.show_min = show_min_;
+  return c;
+}
+
 bool DataPlotter::render_ui() {
   std::string title = "Plot #" + std::to_string(id_);
   if (!ImGui::Begin(title.c_str(), &open_)) {

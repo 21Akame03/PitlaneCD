@@ -2,6 +2,7 @@
 #define DATA_PLOTTER_PANEL
 
 #include "debug/log_parser.hpp"
+#include "ui/view_config.hpp"
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -15,10 +16,15 @@ public:
       int id,
       const std::unordered_map<std::string, debug::PlotSeries> &series);
 
+  DataPlotter(int id,
+              const std::unordered_map<std::string, debug::PlotSeries> &series,
+              const PlotConfig &cfg);
+
   // Returns false if the user closed this plot window
   bool render_ui();
 
   int id() const { return id_; }
+  PlotConfig export_config() const;
 
 private:
   int id_;

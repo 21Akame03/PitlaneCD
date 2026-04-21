@@ -7,6 +7,7 @@
 namespace ui {
 
 static const char *DBC_DIALOG_KEY = "dbc_file_dialog";
+static const char *SAVE_VIEW_DIALOG_KEY = "save_view_dialog";
 
 SettingsPanel::SettingsPanel(serial::SerialReader &reader,
                              can::DbcParser &parser, AppMode &mode)
@@ -93,6 +94,39 @@ void SettingsPanel::render_ui() {
 
   if (mode_ == AppMode::CanSniffer) {
     dbc_selector();
+  }
+
+  if (mode_ == AppMode::Debug || mode_ == AppMode::Telemetry) {
+    ImGui::SeparatorText("Plots");
+    if (ImGui::Button("+ Plot") && on_new_plot_) {
+      on_new_plot_();
+    }
+  }
+
+  if (mode_ != AppMode::None) {
+    ImGui::SeparatorText("View");
+    if (ImGui::Button("Save View As...")) {
+      IGFD::FileDialogConfig config;
+      config.path = ".";
+      config.fileName = "view.json";
+      config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
+      ImGuiFileDialog::Instance()->OpenDialog(
+          SAVE_VIEW_DIALOG_KEY, "Save View As", ".json", config);
+    }
+    if (saved_feedback_timer_ > 0.0f) {
+      ImGui::SameLine();
+      ImGui::TextDisabled("Saved.");
+      saved_feedback_timer_ -= ImGui::GetIO().DeltaTime;
+    }
+
+    if (ImGuiFileDialog::Instance()->Display(
+            SAVE_VIEW_DIALOG_KEY, ImGuiWindowFlags_None, ImVec2(600, 400),
+            ImVec2(900, 600))) {
+      if (ImGuiFileDialog::Instance()->IsOk() && on_save_view_) {
+        on_save_view_(ImGuiFileDialog::Instance()->GetFilePathName());
+      }
+      ImGuiFileDialog::Instance()->Close();
+    }
   }
 
   ImGui::End();

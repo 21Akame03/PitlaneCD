@@ -13,6 +13,21 @@ DebugPanel::DebugPanel(serial::SerialReader &reader)
 
 void DebugPanel::Clear() { state_.Clear(); }
 
+void DebugPanel::add_plot() {
+  plotters_.emplace_back(next_plot_id_++, state_.series);
+}
+
+void DebugPanel::add_plot(const ui::PlotConfig &cfg) {
+  plotters_.emplace_back(next_plot_id_++, state_.series, cfg);
+}
+
+std::vector<ui::PlotConfig> DebugPanel::export_plot_configs() const {
+  std::vector<ui::PlotConfig> out;
+  out.reserve(plotters_.size());
+  for (auto &p : plotters_) out.push_back(p.export_config());
+  return out;
+}
+
 void DebugPanel::render_ui() {
   auto lines = reader_.PollRxBuffer();
   for (auto &line : lines) {

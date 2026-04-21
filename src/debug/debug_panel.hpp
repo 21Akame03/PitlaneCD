@@ -14,6 +14,9 @@ public:
 
   void render_ui();
   void Clear();
+  void add_plot();
+  void add_plot(const ui::PlotConfig &cfg);
+  std::vector<ui::PlotConfig> export_plot_configs() const;
 
 private:
   AppState state_;
